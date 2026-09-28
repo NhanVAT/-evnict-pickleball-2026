@@ -124,4 +124,5 @@ Repo chỉ chứa thư mục `web/`; không đưa file docx/xlsx gốc, thư m�
 - Trang VĐV còn 3 tab: **Tổng quan**, **Bảng đấu**, **Nhánh đấu**. "Bảng đấu" gộp Lịch đấu + Xếp hạng: mỗi bảng có bảng xếp hạng ở trên, các trận của bảng ở dưới (theo thứ tự thi đấu trong Excel). Tìm tên VĐV tô sáng dòng và trận của cặp đó, không ẩn trận khác.
 - Bỏ hiển thị lượt và giờ ở mọi nơi; giữ số sân (6 sân). Tổng quan bỏ khối "Sắp đấu".
 - Admin lọc theo **Nội dung + Bảng** (Bảng A–D hoặc Loại trực tiếp) thay cho lượt.
-- Để sau: 6 tài khoản trọng tài, admin giao trận cho từng trọng tài; luật bảo mật cho mỗi trọng tài chỉ ghi trận được giao.
+- Tên sân thật (phiếu đặt sân 04/10): Sân 1→**Sân thi đấu**, 2→Sân 4, 3→Sân 5, 4→Sân 6, 5→Sân 7, 6→Sân 8 (`courtNames` trong tournament.json).
+- **Trọng tài**: 6 tài khoản Firebase `trongtai1..6@evnict-pickleball.web.app` (danh sách công khai tên + UID ở `public/data/referees.json`; mật khẩu chỉ ở file ngoài repo). `/assign/{matchId} = uid` do BTC ghi (từng trận hoặc "Giao cả bảng"). Luật: điểm một trận chỉ ghi được bởi BTC hoặc đúng trọng tài được giao; `/assign` và `/overrides` chỉ BTC. Trọng tài đăng nhập `/admin` chỉ thấy trận của mình. Trang VĐV hiện tên trọng tài trên từng trận.

@@ -186,3 +186,9 @@ button:disabled { cursor: not-allowed; opacity: .4; }
 .group-block .table-card { margin-top: 0; }
 .group-matches { margin-top: 10px; }
 tr.me td { background: color-mix(in srgb, var(--ball) 45%, transparent); font-weight: 600; }
+.ref { font-size: 13px; color: var(--muted); margin: -2px 0 6px; }
+.a-assign { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: var(--muted); }
+.a-assign select, .bulk select { flex: 1; min-width: 0; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; }
+.bulk { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--surface-2); border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 14px; }
+.a-actions button.primary { background: var(--grass); color: #fff; border-color: var(--grass); }
+.a-actions button.ghost { background: transparent; color: var(--live); border-color: transparent; }

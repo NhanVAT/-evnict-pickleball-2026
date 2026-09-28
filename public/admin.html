@@ -35,8 +35,8 @@
   <section id="panel" hidden>
     <div class="toolbar">
       <span class="conn" id="conn">Đang kết nối…</span>
-      <select id="f-ev" aria-label="Nội dung"></select>
-      <select id="f-grp" aria-label="Bảng"></select>
+      <select id="f-ev" aria-label="Nội dung" data-admin></select>
+      <select id="f-grp" aria-label="Bảng" data-admin></select>
       <span class="sp"></span>
       <button class="btn" id="logout">Đăng xuất</button>
     </div>
@@ -44,6 +44,9 @@
       <h2 class="sec">Xử lý bằng điểm</h2>
       <div id="ties-list"></div>
     </section>
+    <p class="empty" id="no-role" hidden>Tài khoản này chưa được cấp quyền nhập tỷ số. Báo Ban tổ chức nhé.</p>
+    <h2 class="sec" id="mine-title" hidden></h2>
+    <div class="bulk" id="bulk" hidden><label for="bulk-ref">Giao cả bảng này cho</label><select id="bulk-ref"></select></div>
     <div id="list"></div>
   </section>
 </main>

@@ -3,12 +3,16 @@
     ".read": true,
     "scores": {
       "$match": {
-        ".write": "auth != null && auth.uid === 'vRU5cNvtbEVdBlJOzi1EBHFHwSo2'",
+        ".write": "auth != null && (auth.uid === 'vRU5cNvtbEVdBlJOzi1EBHFHwSo2' || root.child('assign').child($match).val() === auth.uid)",
         ".validate": "newData.hasChildren(['s1', 's2', 'status']) && newData.child('s1').isNumber() && newData.child('s1').val() >= 0 && newData.child('s1').val() <= 99 && newData.child('s2').isNumber() && newData.child('s2').val() >= 0 && newData.child('s2').val() <= 99 && (newData.child('status').val() === 'live' || newData.child('status').val() === 'done')"
       }
     },
     "overrides": {
       ".write": "auth != null && auth.uid === 'vRU5cNvtbEVdBlJOzi1EBHFHwSo2'"
+    },
+    "assign": {
+      ".write": "auth != null && auth.uid === 'vRU5cNvtbEVdBlJOzi1EBHFHwSo2'",
+      "$match": { ".validate": "newData.isString()" }
     }
   }
 }

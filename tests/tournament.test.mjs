@@ -54,3 +54,8 @@ test('mọi lượt đều có giờ; nguồn loại trực tiếp trỏ đúng'
     for (const s of [m.src1, m.src2].filter(Boolean)) if (s.winner) assert.ok(ids.has(s.winner), m.id);
   }
 });
+
+test('6 sân có tên thật theo phiếu đặt sân', () => {
+  assert.deepEqual(t.courtNames, { 1: 'Sân thi đấu', 2: 'Sân 4', 3: 'Sân 5', 4: 'Sân 6', 5: 'Sân 7', 6: 'Sân 8' });
+  for (const m of t.matches) assert.ok(t.courtNames[m.court], m.id);
+});

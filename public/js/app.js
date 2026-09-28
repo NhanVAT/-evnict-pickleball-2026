@@ -1,9 +1,11 @@
 import { buildView, nameOf } from './engine.js';
 import { createStore, isDemo } from './store.js';
-import { esc, normalize, load, save, byRoundCourt } from './util.js';
+import { esc, normalize, load, save, byRoundCourt, courtName } from './util.js';
 
 const $ = s => document.querySelector(s);
-const t = await fetch('data/tournament.json', { cache: 'no-cache' }).then(r => r.json());
+const [t, referees] = await Promise.all(['data/tournament.json', 'data/referees.json']
+  .map(u => fetch(u, { cache: 'no-cache' }).then(r => r.json())));
+const REF_NAME = Object.fromEntries(referees.map(r => [r.uid, r.name]));
 const EVENTS = Object.fromEntries(t.events.map(e => [e.id, e]));
 const TABS = ['home', 'groups', 'bracket'];
 const OLD_TABS = { schedule: 'groups', standings: 'groups' }; // link cũ vẫn mở đúng tab
@@ -13,6 +15,7 @@ const state = {
   grp: load('pb-grp', 'MD'), bracket: load('pb-bracket', 'MD'), q: load('pb-q', ''),
 };
 let view = buildView(t);
+let assign = {}; // matchId → uid trọng tài
 
 // ---------- Mảnh giao diện
 function statusPill(m) {
@@ -30,7 +33,8 @@ function side(m, n) {
 
 function matchCard(m, mine = false) {
   return `<article class="match ${m.status}${mine ? ' mine' : ''}">
-    <div class="match-meta"><span class="court-no">Sân ${m.court}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${statusPill(m)}</div>
+    <div class="match-meta"><span class="court-no">${esc(courtName(t, m.court))}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${statusPill(m)}</div>
+    ${REF_NAME[assign[m.id]] ? `<div class="ref">Trọng tài: ${esc(REF_NAME[assign[m.id]])}</div>` : ''}
     ${side(m, 1)}${side(m, 2)}
   </article>`;
 }
@@ -149,7 +153,7 @@ try {
     if (on) { everConnected = true; clearTimeout(slow); }
     if (everConnected) setConn(on);
   });
-  store.onData(d => { view = buildView(t, d.scores, d.overrides); render(); });
+  store.onData(d => { view = buildView(t, d.scores, d.overrides); assign = d.assign ?? {}; render(); });
 } catch (err) {
   console.error(err);
   clearTimeout(slow);

@@ -10,7 +10,7 @@ export function createStore() {
 function createDemoStore() {
   const KEY = 'pb-demo-db';
   const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) ?? {}; } catch { return {}; } };
-  const snapshot = () => { const v = read(); return { scores: v.scores ?? {}, overrides: v.overrides ?? {} }; };
+  const snapshot = () => { const v = read(); return { scores: v.scores ?? {}, overrides: v.overrides ?? {}, assign: v.assign ?? {} }; };
   const dataCbs = new Set(), authCbs = new Set();
   let user = null;
   const emit = () => { const d = snapshot(); dataCbs.forEach(cb => cb(d)); };
@@ -27,7 +27,7 @@ function createDemoStore() {
     onData(cb) { dataCbs.add(cb); cb(snapshot()); },
     onConnection(cb) { cb(true); },
     onAuth(cb) { authCbs.add(cb); cb(user); },
-    signIn: email => setUser({ email: email || 'demo@local' }),
+    signIn: email => setUser({ email: email || 'demo@local', uid: null }),
     signOut: () => setUser(null),
     setScore: (id, v) => write(db => {
       db.scores ??= {};
@@ -36,6 +36,11 @@ function createDemoStore() {
     setOverride: (ev, g, order) => write(db => {
       db.overrides ??= {}; db.overrides[ev] ??= {};
       if (order) db.overrides[ev][g] = order; else delete db.overrides[ev][g];
+    }),
+    // changes = { matchId: uid | null }
+    setAssign: changes => write(db => {
+      db.assign ??= {};
+      for (const [id, uid] of Object.entries(changes)) { if (uid) db.assign[id] = uid; else delete db.assign[id]; }
     }),
   };
 }
@@ -55,7 +60,7 @@ async function createFirebaseStore() {
     onData(cb) {
       dbm.onValue(dbm.ref(db), s => {
         const v = s.val() ?? {};
-        cb({ scores: v.scores ?? {}, overrides: v.overrides ?? {} });
+        cb({ scores: v.scores ?? {}, overrides: v.overrides ?? {}, assign: v.assign ?? {} });
       });
     },
     onConnection(cb) { dbm.onValue(dbm.ref(db, '.info/connected'), s => cb(s.val() === true)); },
@@ -70,5 +75,7 @@ async function createFirebaseStore() {
       const r = dbm.ref(db, `overrides/${ev}/${g}`);
       return order ? dbm.set(r, order) : dbm.remove(r);
     },
+    // changes = { matchId: uid | null }; null xoá phân công
+    setAssign(changes) { return dbm.update(dbm.ref(db, 'assign'), changes); },
   };
 }

@@ -12,6 +12,8 @@ import openpyxl
 ROUND_TIMES = {1: "07:00", 2: "07:18", 3: "07:36", 4: "07:54", 5: "08:12", 6: "08:30",
                7: "08:53", 8: "09:11", 9: "09:29",
                10: "09:52", 11: "10:17", 12: "10:42", 13: "11:07", 14: "11:32"}
+# Số sân trong Excel/Điều lệ → tên sân thật theo phiếu đặt sân ngày 04/10
+COURT_NAMES = {1: "Sân thi đấu", 2: "Sân 4", 3: "Sân 5", 4: "Sân 6", 5: "Sân 7", 6: "Sân 8"}
 EVENTS = [("MD", "Đôi Nam", "Đôi Nam"), ("XD", "Đôi Nam - Nữ", "Đôi Nam-Nữ"), ("WD", "Đôi Nữ", "Đôi Nữ")]
 
 
@@ -83,6 +85,7 @@ def main(src, out):
         "date": "2026-10-04", "dateText": "Chủ nhật, 04/10/2026", "venue": "Hà Nội",
         "hours": "7h00 – 12h00", "courts": 6, "endTime": "11:57",
         "rounds": {str(k): v for k, v in ROUND_TIMES.items()},
+        "courtNames": {str(k): v for k, v in COURT_NAMES.items()},
         "events": events, "matches": matches,
     }
     Path(out).parent.mkdir(parents=True, exist_ok=True)

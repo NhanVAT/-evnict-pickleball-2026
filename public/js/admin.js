@@ -1,9 +1,12 @@
 import { buildView, nameOf } from './engine.js';
 import { createStore } from './store.js';
-import { esc, load, save } from './util.js';
+import { ADMIN_UID } from './firebase-config.js';
+import { esc, load, save, courtName } from './util.js';
 
 const $ = s => document.querySelector(s);
-const t = await fetch('data/tournament.json', { cache: 'no-cache' }).then(r => r.json());
+const [t, referees] = await Promise.all(['data/tournament.json', 'data/referees.json']
+  .map(u => fetch(u, { cache: 'no-cache' }).then(r => r.json())));
+const REF_NAME = Object.fromEntries(referees.map(r => [r.uid, r.name]));
 const EVENTS = Object.fromEntries(t.events.map(e => [e.id, e]));
 const fatal = msg => { $('#fatal').textContent = msg; $('#fatal').hidden = !msg; };
 const slow = setTimeout(() => fatal('Chưa tải được Firebase. Kiểm tra mạng hoặc chuyển sang 4G rồi tải lại trang.'), 10000);
@@ -18,7 +21,7 @@ try {
 }
 fatal('');
 
-let data = { scores: {}, overrides: {} };
+let data = { scores: {}, overrides: {}, assign: {} };
 let view = buildView(t);
 const KO = 'KO'; // mục "Loại trực tiếp" trong bộ lọc bảng
 const groupsOf = ev => [...Object.keys(EVENTS[ev].groups), KO];
@@ -28,6 +31,21 @@ if (!groupsOf(state.ev).includes(state.grp)) state.grp = 'A';
 let armed = null; // id trận đang chờ bấm lần 2 để xóa tỷ số
 const drafts = new Map(); // "ev/g" → thứ tự đang sắp dở ở khu bằng điểm, giữ qua các lần vẽ lại
 let online = false, everConnected = false, pending = 0;
+let me = null; // { uid, admin, name } của người đang đăng nhập
+
+// Chế độ thử không có Firebase Auth: email trongtaiN@… đóng vai trọng tài N, email khác là BTC
+const demoUid = email => {
+  const m = /^trongtai(\d+)@/.exec(email ?? '');
+  return m ? referees[m[1] - 1]?.uid ?? null : ADMIN_UID;
+};
+function whoIs(user) {
+  if (!user) return null;
+  const uid = store.demo ? demoUid(user.email) : user.uid;
+  if (uid === ADMIN_UID) return { uid, admin: true, name: 'Ban tổ chức' };
+  return { uid, admin: false, name: REF_NAME[uid] ?? null };
+}
+const refOptions = (selected, empty) => `<option value="">${empty}</option>`
+  + referees.map(r => `<option value="${r.uid}"${r.uid === selected ? ' selected' : ''}>${r.id}. ${esc(r.name)}</option>`).join('');
 
 // SDK web chỉ giữ thao tác chưa gửi trong bộ nhớ tab: mất mạng thì phải giữ trang mở
 function renderConn() {
@@ -87,9 +105,10 @@ function card(m) {
       : `<button data-act="reopen">Sửa lại</button>${clear}`;
   const pill = m.status === 'live' ? '<span class="pill live">Đang đấu</span>' : m.status === 'done' ? '<span class="pill">Đã xong</span>' : '';
   return `<article class="a-match ${m.status}" data-id="${m.id}">
-    <div class="match-meta"><span class="court-no">Sân ${m.court}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${pill}</div>
+    <div class="match-meta"><span class="court-no">${esc(courtName(t, m.court))}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${pill}</div>
     ${side(1)}${side(2)}
     <div class="a-actions">${actions}</div>
+    ${me?.admin ? `<label class="a-assign">Trọng tài <select data-act="assign">${refOptions(data.assign[m.id], 'Chưa giao')}</select></label>` : ''}
   </article>`;
 }
 
@@ -115,11 +134,24 @@ function renderTies() {
   }).join('');
 }
 
-function render() {
-  const ms = view.matches.filter(m => m.event === state.ev
+function currentMatches() {
+  if (!me?.admin) return view.matches.filter(m => data.assign[m.id] === me?.uid);
+  return view.matches.filter(m => m.event === state.ev
     && (state.grp === KO ? m.stage !== 'G' : m.stage === 'G' && m.group === state.grp));
-  $('#list').innerHTML = ms.map(card).join('') || '<p class="empty">Không có trận nào.</p>';
-  renderTies();
+}
+
+function render() {
+  const admin = Boolean(me?.admin), known = admin || Boolean(me?.name);
+  document.querySelectorAll('[data-admin]').forEach(el => { el.hidden = !admin; });
+  $('#no-role').hidden = !me || known;
+  $('#bulk').hidden = !admin || state.grp === KO;
+  $('#mine-title').hidden = admin || !known;
+  if (!known) { $('#list').innerHTML = ''; $('#ties').hidden = true; return; }
+  const ms = currentMatches();
+  if (!admin) $('#mine-title').textContent = `Trận giao cho ${me.name} (${ms.length})`;
+  $('#list').innerHTML = ms.map(card).join('')
+    || `<p class="empty">${admin ? 'Không có trận nào.' : 'Chưa có trận nào được giao cho bạn. Báo Ban tổ chức nhé.'}</p>`;
+  if (admin) renderTies(); else $('#ties').hidden = true;
 }
 
 $('#list').addEventListener('click', e => {
@@ -141,6 +173,22 @@ $('#list').addEventListener('click', e => {
   else if (act === 'clear') {
     if (armed === id) { armed = null; put(null); } else { armed = id; render(); }
   }
+});
+
+$('#list').addEventListener('change', e => {
+  const sel = e.target.closest('select[data-act="assign"]');
+  if (!sel) return;
+  const id = sel.closest('[data-id]').dataset.id;
+  track(store.setAssign({ [id]: sel.value || null })).catch(fail);
+});
+
+$('#bulk-ref').addEventListener('change', e => {
+  const uid = e.target.value;
+  e.target.value = '';
+  if (!uid) return;
+  const ids = currentMatches().map(m => m.id);
+  track(store.setAssign(Object.fromEntries(ids.map(id => [id, uid]))))
+    .then(() => toast(`Đã giao ${ids.length} trận cho ${REF_NAME[uid]}`)).catch(fail);
 });
 
 $('#ties-list').addEventListener('click', e => {
@@ -171,10 +219,13 @@ $('#logout').onclick = () => store.signOut();
 
 $('#demo-note').hidden = !store.demo;
 buildFilters();
+$('#bulk-ref').innerHTML = refOptions(null, 'Chọn trọng tài…');
 store.onAuth(user => {
+  me = whoIs(user);
   $('#login').hidden = Boolean(user);
   $('#panel').hidden = !user;
-  $('#who').textContent = user?.email ?? '';
+  $('#who').textContent = me ? (me.name ?? user.email) : '';
+  render();
 });
 store.onConnection(on => {
   // .info/connected luôn báo false trước: chỉ báo mất kết nối sau khi đã từng kết nối

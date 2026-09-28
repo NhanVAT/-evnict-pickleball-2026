@@ -15,3 +15,5 @@ export function save(key, value) {
 }
 
 export const byRoundCourt = (a, b) => a.round - b.round || a.court - b.court;
+
+export const courtName = (t, n) => t.courtNames?.[n] ?? `Sân ${n}`;
