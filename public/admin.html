@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2c6a50">
+<title>Nhập tỷ số · Pickleball EVNICT 2026</title>
+<link rel="icon" href="img/ball.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin">
+<header class="hero">
+  <div class="hero-inner">
+    <p class="kicker">Ban tổ chức</p>
+    <h1>Nhập tỷ số</h1>
+    <p class="meta"><span id="who"></span><a class="btn" href="./" target="_blank" rel="noopener">Mở trang công khai</a></p>
+  </div>
+</header>
+<main>
+  <p class="empty" id="demo-note" hidden>Chế độ thử: dữ liệu chỉ lưu trong trình duyệt này. Đăng nhập bằng email bất kỳ, không cần mật khẩu.</p>
+  <section id="login" hidden>
+    <form class="login" id="login-form">
+      <h2>Đăng nhập</h2>
+      <label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required>
+      <label for="password">Mật khẩu</label><input id="password" name="password" type="password" autocomplete="current-password">
+      <button class="primary" type="submit">Đăng nhập</button>
+      <p class="err" id="login-err" role="alert"></p>
+    </form>
+  </section>
+  <section id="panel" hidden>
+    <div class="toolbar">
+      <span class="conn" id="conn">Đang kết nối…</span>
+      <select id="f-ev" aria-label="Nội dung"></select>
+      <select id="f-round" aria-label="Lượt"></select>
+      <span class="sp"></span>
+      <button class="btn" id="logout">Đăng xuất</button>
+    </div>
+    <section id="ties" hidden>
+      <h2 class="sec">Xử lý bằng điểm</h2>
+      <div id="ties-list"></div>
+    </section>
+    <div id="list"></div>
+  </section>
+</main>
+<div id="toast" role="status" hidden></div>
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>
