@@ -65,7 +65,9 @@ Trình duyệt người xem / admin  <---- realtime ---->  Firebase Realtime Dat
 
 Mỗi đội: Trận, Thắng, Thua, Điểm (thắng ×3), Ghi, Thủng, Hiệu số. Sắp xếp giảm dần theo Điểm → Hiệu số → Ghi. Nếu còn hòa hoàn toàn và có `overrides` cho bảng đó, dùng thứ tự override; nếu không, giữ thứ tự mã vị trí và đánh dấu "cần BTC xử" trên trang admin.
 
-Một bảng được coi là **xong** khi mọi trận của bảng có `status = "done"`. Chỉ khi bảng xong mới điền đội vào vòng loại trực tiếp; trước đó hiển thị "(chờ bảng A)". Trận loại trực tiếp chưa có đội hiển thị "(chờ)".
+Một bảng được coi là **xong** khi mọi trận của bảng có `status = "done"`. Chỉ khi bảng xong (và không hòa hoàn toàn chỉ số chưa được BTC chốt) mới điền đội vào vòng loại trực tiếp; trước đó ô hiển thị nguồn, ví dụ "Nhất bảng A", "Thắng Tứ kết 1".
+
+Trang admin liệt kê các bảng đã xong có đội **bằng điểm** ở ranh giới nhất/nhì hoặc nhì/ba để BTC kiểm lại theo Điều lệ III.3 (hiệu số trong nhóm, đối đầu) và chốt tay nếu thứ tự khác với cách tính của Excel; chỉ trường hợp hòa hoàn toàn chỉ số mới chặn nhánh đấu.
 
 Tỷ số hòa không hợp lệ: admin không bấm được "Kết thúc" khi s1 = s2.
 
@@ -106,8 +108,8 @@ Repo chỉ chứa thư mục `web/`; không đưa file docx/xlsx gốc, thư m�
 ## 6. Triển khai
 
 - Firebase Hosting, thư mục `public/`; `firebase.json` + `database.rules.json` trong repo.
-- GitHub Actions `FirebaseExtended/action-hosting-deploy` deploy khi push `main`; service account lưu ở GitHub Secrets.
-- Việc người dùng tự làm (cần đăng nhập tài khoản của họ): tạo project Firebase `evnict-pickleball`, bật Realtime Database + Auth email, tạo tài khoản admin, tạo repo GitHub, thêm secret. Có hướng dẫn từng bước trong `README.md`.
+- Deploy bằng Firebase CLI từ máy (`npm run deploy`, deploy cả hosting lẫn luật database). GitHub giữ mã nguồn. (Đã bỏ GitHub Actions: cần service account key và thêm bước cấu hình, không đáng với 6 ngày còn lại; có thể thêm sau giải.)
+- Việc người dùng tự làm (cần đăng nhập tài khoản của họ): tạo project Firebase `evnict-pickleball`, bật Realtime Database + Auth email, tạo tài khoản admin, `firebase login`, tạo repo GitHub trống. Có hướng dẫn từng bước trong `README.md`.
 
 ## 7. Kiểm thử
 
