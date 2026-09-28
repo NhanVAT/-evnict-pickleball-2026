@@ -20,7 +20,7 @@ let assign = {}; // matchId → uid trọng tài
 // ---------- Mảnh giao diện
 function statusPill(m) {
   if (m.status === 'live') return '<span class="pill live">Đang đấu</span>';
-  if (m.status === 'done') return '<span class="pill">Kết thúc</span>';
+  if (m.status === 'done') return m.score.confirmed ? '<span class="pill ok">Đã xác nhận</span>' : '<span class="pill">Kết thúc</span>';
   return '';
 }
 
@@ -36,6 +36,7 @@ function matchCard(m, mine = false) {
     <div class="match-meta"><span class="court-no">${esc(courtName(t, m.court))}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${statusPill(m)}</div>
     ${REF_NAME[assign[m.id]] ? `<div class="ref">Trọng tài: ${esc(REF_NAME[assign[m.id]])}</div>` : ''}
     ${side(m, 1)}${side(m, 2)}
+    ${m.score?.forfeit && m[`team${m.score.forfeit.loser}`] ? `<p class="lock-note">${m[`team${m.score.forfeit.loser}`]} bị xử thua: ${m.score.forfeit.reason === 'retired' ? 'bỏ cuộc giữa chừng' : 'vắng mặt / đến muộn'}</p>` : ''}
   </article>`;
 }
 

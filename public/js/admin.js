@@ -1,4 +1,4 @@
-import { buildView, nameOf } from './engine.js';
+import { buildView, nameOf, forfeitScore } from './engine.js';
 import { createStore } from './store.js';
 import { ADMIN_UID } from './firebase-config.js';
 import { esc, load, save, courtName } from './util.js';
@@ -29,6 +29,7 @@ const state = { ev: load('pb-admin-ev', 'MD'), bk: load('pb-admin-bk', 'MD') };
 if (!EVENTS[state.ev]) state.ev = 'MD';
 if (!EVENTS[state.bk]) state.bk = 'MD';
 let armed = null; // id trận đang chờ bấm lần 2 để xóa tỷ số
+let forfeitOpen = null; // id trận đang mở bảng chọn xử thua
 const drafts = new Map(); // "ev/g" → thứ tự đang sắp dở ở khu bằng điểm, giữ qua các lần vẽ lại
 let online = false, everConnected = false, pending = 0;
 let me = null; // { uid, admin, name } của người đang đăng nhập
@@ -86,6 +87,28 @@ function meta(m, pill) {
   return `<div class="match-meta"><span class="court-no">${esc(courtName(t, m.court))}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${pill}</div>`;
 }
 
+const REASON = { absent: 'vắng mặt / đến muộn', retired: 'bỏ cuộc giữa chừng' };
+
+function statusPill(m) {
+  if (m.status === 'live') return '<span class="pill live">Đang đấu</span>';
+  if (m.status !== 'done') return '';
+  return m.score.confirmed ? '<span class="pill ok">Đã xác nhận</span>' : '<span class="pill">Chờ BTC xác nhận</span>';
+}
+
+function forfeitLine(m) {
+  const f = m.score?.forfeit;
+  const code = f && m[`team${f.loser}`];
+  return code ? `<p class="lock-note">${code} bị xử thua: ${REASON[f.reason]}</p>` : '';
+}
+
+// Điều lệ III.4: chọn đội bị xử thua và lý do; bỏ cuộc chỉ có khi trận đang đấu
+function forfeitPanel(m) {
+  const btn = (n, reason, text) => `<button data-act="ff" data-loser="${n}" data-reason="${reason}">${m[`team${n}`]} ${text}</button>`;
+  return `<div class="ff"><p>Đội nào bị xử thua?</p>
+    ${[1, 2].map(n => btn(n, 'absent', 'vắng mặt') + (m.status === 'live' ? btn(n, 'retired', 'bỏ cuộc') : '')).join('')}
+    <button data-act="ff-cancel" class="ghost">Hủy</button></div>`;
+}
+
 function editCard(m) {
   const ready = Boolean(m.team1 && m.team2);
   const s = m.score ?? { s1: 0, s2: 0 };
@@ -98,16 +121,21 @@ function editCard(m) {
       <output>${s[`s${n}`]}</output>
       <button data-act="inc" data-side="${n}" ${locked ? 'disabled' : ''} aria-label="Cộng 1 điểm">+</button></div></div>`;
   };
+  const admin = Boolean(me?.admin);
+  const confirmed = m.score?.confirmed === true;
   const clear = `<button data-act="clear" class="ghost">${armed === m.id ? 'Bấm lần nữa để xóa' : 'Xóa tỷ số'}</button>`;
-  const actions = m.status === 'pending'
-    ? `<button data-act="start" class="primary" ${ready ? '' : 'disabled'}>Bắt đầu trận</button>`
-    : m.status === 'live'
-      ? `<button data-act="finish" class="primary" ${s.s1 === s.s2 ? 'disabled title="Tỷ số đang hòa"' : ''}>Kết thúc trận</button>${clear}`
-      : `<button data-act="reopen">Sửa lại</button>${clear}`;
-  const pill = m.status === 'live' ? '<span class="pill live">Đang đấu</span>' : m.status === 'done' ? '<span class="pill">Đã xong</span>' : '';
+  const ffBtn = ready ? '<button data-act="ff-open">Xử thua…</button>' : '';
+  let actions;
+  if (forfeitOpen === m.id) actions = forfeitPanel(m);
+  else if (m.status === 'pending') actions = `<button data-act="start" class="primary" ${ready ? '' : 'disabled'}>Bắt đầu trận</button>${ffBtn}`;
+  else if (m.status === 'live') actions = `<button data-act="finish" class="primary" ${s.s1 === s.s2 ? 'disabled title="Tỷ số đang hòa"' : ''}>Kết thúc trận</button>${ffBtn}${clear}`;
+  else if (confirmed) actions = admin ? '<button data-act="unconfirm">Bỏ xác nhận để sửa</button>' : '<p class="lock-note">BTC đã xác nhận kết quả. Cần sửa thì báo Ban tổ chức.</p>';
+  else actions = `${admin ? '<button data-act="confirm" class="primary">Xác nhận kết quả</button>' : ''}<button data-act="reopen">Sửa lại</button>${clear}`;
+  const pill = statusPill(m);
   return `<article class="a-match ${m.status}" data-id="${m.id}">
     ${meta(m, pill)}
     ${side(1)}${side(2)}
+    ${forfeitLine(m)}
     <div class="a-actions">${actions}</div>
     ${refLine(m)}
   </article>`;
@@ -120,8 +148,7 @@ function viewCard(m) {
     const pts = m.status === 'pending' ? '–' : m.score[`s${n}`];
     return `<div class="side${m.winner === n ? ' win' : ''}"><span class="code">${code ?? ''}</span><span class="name">${name}</span><span class="pts">${pts}</span></div>`;
   };
-  const pill = m.status === 'live' ? '<span class="pill live">Đang đấu</span>' : m.status === 'done' ? '<span class="pill">Kết thúc</span>' : '';
-  return `<article class="match ${m.status}" data-id="${m.id}">${meta(m, pill)}${refLine(m)}${side(1)}${side(2)}</article>`;
+  return `<article class="match ${m.status}" data-id="${m.id}">${meta(m, statusPill(m))}${refLine(m)}${side(1)}${side(2)}${forfeitLine(m)}</article>`;
 }
 
 const card = m => (canEdit(m) ? editCard(m) : viewCard(m));
@@ -243,6 +270,7 @@ $('#panel').addEventListener('click', e => {
   const put = v => track(store.setScore(id, v)).catch(fail);
   const act = b.dataset.act;
   if (act !== 'clear') armed = null;
+  if (act !== 'ff-open') forfeitOpen = null;
   if (act === 'inc' || act === 'dec') {
     const k = `s${b.dataset.side}`;
     const next = { s1: cur.s1, s2: cur.s2, status: 'live' };
@@ -251,6 +279,11 @@ $('#panel').addEventListener('click', e => {
   } else if (act === 'start') put({ s1: 0, s2: 0, status: 'live' });
   else if (act === 'finish') put({ s1: cur.s1, s2: cur.s2, status: 'done' });
   else if (act === 'reopen') put({ s1: cur.s1, s2: cur.s2, status: 'live' });
+  else if (act === 'confirm') put({ s1: cur.s1, s2: cur.s2, status: 'done', ...(cur.forfeit ? { forfeit: cur.forfeit } : {}), confirmed: true });
+  else if (act === 'unconfirm') put({ s1: cur.s1, s2: cur.s2, status: 'done', ...(cur.forfeit ? { forfeit: cur.forfeit } : {}) });
+  else if (act === 'ff-open') { forfeitOpen = id; render(); }
+  else if (act === 'ff-cancel') render();
+  else if (act === 'ff') put(forfeitScore(view.byId[id], data.scores[id], Number(b.dataset.loser), b.dataset.reason));
   else if (act === 'clear') {
     if (armed === id) { armed = null; put(null); } else { armed = id; render(); }
   }

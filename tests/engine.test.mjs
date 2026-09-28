@@ -109,3 +109,23 @@ test('thứ tự BTC chốt chỉ phân định trong nhóm bằng điểm, khô
   assert.deepEqual(g.rows.map(r => r.code), ['A1', 'A4', 'A3', 'A2']);
   assert.equal(g.overridden, true);
 });
+
+import { forfeitScore } from '../public/js/engine.js';
+
+test('xử thua vắng mặt: 0-11 vòng bảng, 0-15 loại trực tiếp (Điều lệ III.4)', () => {
+  const g = t.matches.find(m => m.id === 'MD-G01'), qf = t.matches.find(m => m.id === 'MD-QF1');
+  assert.deepEqual(forfeitScore(g, null, 2, 'absent'), { s1: 11, s2: 0, status: 'done', forfeit: { loser: 2, reason: 'absent' } });
+  assert.deepEqual(forfeitScore(qf, { s1: 3, s2: 4 }, 1, 'absent'), { s1: 0, s2: 15, status: 'done', forfeit: { loser: 1, reason: 'absent' } });
+});
+
+test('bỏ cuộc giữa chừng: đội bỏ cuộc giữ điểm, đội kia đủ điểm thắng (vẫn hơn 2 điểm)', () => {
+  const g = t.matches.find(m => m.id === 'MD-G01');
+  assert.deepEqual(forfeitScore(g, { s1: 7, s2: 9 }, 2, 'retired'), { s1: 11, s2: 9, status: 'done', forfeit: { loser: 2, reason: 'retired' } });
+  assert.equal(forfeitScore(g, { s1: 10, s2: 12 }, 2, 'retired').s1, 14);
+});
+
+test('trận xử thua tính điểm và hiệu số như trận thường', () => {
+  const g = computeGroup(t, 'MD', 'A', { 'MD-G01': forfeitScore(t.matches[0], null, 2, 'absent') });
+  const a1 = g.rows.find(r => r.code === 'A1'), a2 = g.rows.find(r => r.code === 'A2');
+  assert.deepEqual([a1.pts, a1.diff, a2.diff], [3, 11, -11]);
+});

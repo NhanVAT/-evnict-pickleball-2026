@@ -16,6 +16,17 @@ function winnerSide(score) {
   return score.s1 > score.s2 ? 1 : 2;
 }
 
+// Điều lệ III.4: vắng mặt/đến muộn → 0-11 (vòng bảng) hoặc 0-15 (loại trực tiếp);
+// bỏ cuộc giữa chừng → đội bỏ cuộc giữ điểm, đội kia được đủ điểm thắng (vẫn phải hơn 2 điểm).
+// Tỷ số này tính vào hiệu số như trận thường.
+export function forfeitScore(m, current, loser, reason) {
+  const target = m.stage === 'G' ? 11 : 15;
+  const lose = reason === 'retired' ? current?.[`s${loser}`] ?? 0 : 0;
+  const win = Math.max(target, lose + 2);
+  const forfeit = { loser, reason };
+  return loser === 1 ? { s1: lose, s2: win, status: 'done', forfeit } : { s1: win, s2: lose, status: 'done', forfeit };
+}
+
 const compare = (x, y) => y.pts - x.pts || y.diff - x.diff || y.pf - x.pf;
 
 export function computeGroup(t, eventId, group, scores, override) {

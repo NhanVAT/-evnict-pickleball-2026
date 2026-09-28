@@ -201,3 +201,7 @@ tr.me td { background: color-mix(in srgb, var(--ball) 45%, transparent); font-we
 .group-ref .ref { margin: 0; }
 .mine-group .table-card { border: 2px solid var(--grass); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ball) 60%, transparent); }
 .group-matches .a-match { margin-bottom: 0; }
+.pill.ok { background: color-mix(in srgb, var(--win) 18%, transparent); color: var(--win); }
+.lock-note { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+.ff { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; }
+.ff p { width: 100%; margin: 0; font-weight: 600; }
