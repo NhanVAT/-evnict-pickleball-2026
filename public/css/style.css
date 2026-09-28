@@ -192,3 +192,12 @@ tr.me td { background: color-mix(in srgb, var(--ball) 45%, transparent); font-we
 .bulk { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--surface-2); border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 14px; }
 .a-actions button.primary { background: var(--grass); color: #fff; border-color: var(--grass); }
 .a-actions button.ghost { background: transparent; color: var(--live); border-color: transparent; }
+/* Admin/trọng tài: 2 tab Bảng đấu, Nhánh đấu */
+.off { display: none !important; }
+.a-tabs { margin: 0 -16px; }
+.mine-note { margin: 0 0 12px; font-size: 14px; color: var(--muted); }
+.group-ref { padding: 0 12px 8px; }
+.group-ref .a-assign { margin-top: 0; }
+.group-ref .ref { margin: 0; }
+.mine-group .table-card { border: 2px solid var(--grass); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ball) 60%, transparent); }
+.group-matches .a-match { margin-bottom: 0; }

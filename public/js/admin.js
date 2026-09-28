@@ -8,6 +8,8 @@ const [t, referees] = await Promise.all(['data/tournament.json', 'data/referees.
   .map(u => fetch(u, { cache: 'no-cache' }).then(r => r.json())));
 const REF_NAME = Object.fromEntries(referees.map(r => [r.uid, r.name]));
 const EVENTS = Object.fromEntries(t.events.map(e => [e.id, e]));
+const TABS = ['groups', 'bracket'];
+const STAGE_TITLE = { QF: 'Tứ kết', SF: 'Bán kết', F: 'Chung kết' };
 const fatal = msg => { $('#fatal').textContent = msg; $('#fatal').hidden = !msg; };
 const slow = setTimeout(() => fatal('Chưa tải được Firebase. Kiểm tra mạng hoặc chuyển sang 4G rồi tải lại trang.'), 10000);
 let store;
@@ -23,11 +25,9 @@ fatal('');
 
 let data = { scores: {}, overrides: {}, assign: {} };
 let view = buildView(t);
-const KO = 'KO'; // mục "Loại trực tiếp" trong bộ lọc bảng
-const groupsOf = ev => [...Object.keys(EVENTS[ev].groups), KO];
-const state = { ev: load('pb-admin-ev', 'MD'), grp: load('pb-admin-grp', 'A') };
+const state = { ev: load('pb-admin-ev', 'MD'), bk: load('pb-admin-bk', 'MD') };
 if (!EVENTS[state.ev]) state.ev = 'MD';
-if (!groupsOf(state.ev).includes(state.grp)) state.grp = 'A';
+if (!EVENTS[state.bk]) state.bk = 'MD';
 let armed = null; // id trận đang chờ bấm lần 2 để xóa tỷ số
 const drafts = new Map(); // "ev/g" → thứ tự đang sắp dở ở khu bằng điểm, giữ qua các lần vẽ lại
 let online = false, everConnected = false, pending = 0;
@@ -44,7 +44,8 @@ function whoIs(user) {
   if (uid === ADMIN_UID) return { uid, admin: true, name: 'Ban tổ chức' };
   return { uid, admin: false, name: REF_NAME[uid] ?? null };
 }
-const refOptions = (selected, empty) => `<option value="">${empty}</option>`
+const canEdit = m => Boolean(me?.admin || (me?.uid && data.assign[m.id] === me.uid));
+const refList = (selected, first) => first
   + referees.map(r => `<option value="${r.uid}"${r.uid === selected ? ' selected' : ''}>${r.id}. ${esc(r.name)}</option>`).join('');
 
 // SDK web chỉ giữ thao tác chưa gửi trong bộ nhớ tab: mất mạng thì phải giữ trang mở
@@ -66,26 +67,26 @@ function toast(msg) {
 }
 const fail = err => toast(`Không lưu được: ${err.code ?? err.message}`);
 
-// Select chỉ dựng một lần để không đóng picker trên điện thoại khi dữ liệu đổi
-function buildGroupOptions() {
-  $('#f-grp').innerHTML = groupsOf(state.ev)
-    .map(g => `<option value="${g}">${g === KO ? 'Loại trực tiếp' : `Bảng ${g}`}</option>`).join('');
-  $('#f-grp').value = state.grp;
+function chips(el, value, onPick) {
+  el.innerHTML = t.events.map(e => `<button class="chip${e.id === value ? ' on' : ''}" data-v="${e.id}" aria-pressed="${e.id === value}">${esc(e.name)}</button>`).join('');
+  el.onclick = ev => { const b = ev.target.closest('button'); if (b) onPick(b.dataset.v); };
 }
 
-function buildFilters() {
-  $('#f-ev').innerHTML = t.events.map(e => `<option value="${e.id}">${esc(e.name)}</option>`).join('');
-  $('#f-ev').value = state.ev;
-  buildGroupOptions();
-  $('#f-ev').onchange = e => {
-    state.ev = e.target.value; save('pb-admin-ev', state.ev);
-    if (!groupsOf(state.ev).includes(state.grp)) { state.grp = 'A'; save('pb-admin-grp', state.grp); }
-    buildGroupOptions(); render();
-  };
-  $('#f-grp').onchange = e => { state.grp = e.target.value; save('pb-admin-grp', state.grp); render(); };
+// ---------- Thẻ trận: nhập được (trận của mình / BTC) hoặc chỉ xem
+function refLine(m) {
+  if (m.stage === 'G') return ''; // vòng bảng: trọng tài ghi ở đầu bảng
+  if (me?.admin) {
+    return `<label class="a-assign">Trọng tài <select data-act="assign">${refList(data.assign[m.id], '<option value="">Chưa giao</option>')}</select></label>`;
+  }
+  const n = REF_NAME[data.assign[m.id]];
+  return n ? `<div class="ref">Trọng tài: ${esc(n)}</div>` : '';
 }
 
-function card(m) {
+function meta(m, pill) {
+  return `<div class="match-meta"><span class="court-no">${esc(courtName(t, m.court))}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${pill}</div>`;
+}
+
+function editCard(m) {
   const ready = Boolean(m.team1 && m.team2);
   const s = m.score ?? { s1: 0, s2: 0 };
   const locked = !ready || m.status === 'done';
@@ -105,11 +106,71 @@ function card(m) {
       : `<button data-act="reopen">Sửa lại</button>${clear}`;
   const pill = m.status === 'live' ? '<span class="pill live">Đang đấu</span>' : m.status === 'done' ? '<span class="pill">Đã xong</span>' : '';
   return `<article class="a-match ${m.status}" data-id="${m.id}">
-    <div class="match-meta"><span class="court-no">${esc(courtName(t, m.court))}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${pill}</div>
+    ${meta(m, pill)}
     ${side(1)}${side(2)}
     <div class="a-actions">${actions}</div>
-    ${me?.admin ? `<label class="a-assign">Trọng tài <select data-act="assign">${refOptions(data.assign[m.id], 'Chưa giao')}</select></label>` : ''}
+    ${refLine(m)}
   </article>`;
+}
+
+function viewCard(m) {
+  const side = n => {
+    const code = m[`team${n}`];
+    const name = code ? esc(nameOf(t, m.event, code)) : `<span class="tbd">${esc(m[`hint${n}`])}</span>`;
+    const pts = m.status === 'pending' ? '–' : m.score[`s${n}`];
+    return `<div class="side${m.winner === n ? ' win' : ''}"><span class="code">${code ?? ''}</span><span class="name">${name}</span><span class="pts">${pts}</span></div>`;
+  };
+  const pill = m.status === 'live' ? '<span class="pill live">Đang đấu</span>' : m.status === 'done' ? '<span class="pill">Kết thúc</span>' : '';
+  return `<article class="match ${m.status}" data-id="${m.id}">${meta(m, pill)}${refLine(m)}${side(1)}${side(2)}</article>`;
+}
+
+const card = m => (canEdit(m) ? editCard(m) : viewCard(m));
+
+// ---------- Tab Bảng đấu: xếp hạng ở trên, trận của bảng ở dưới
+function groupHead(e, g, ms) {
+  const refs = [...new Set(ms.map(m => data.assign[m.id] ?? ''))];
+  if (me?.admin) {
+    const cur = refs.length === 1 ? refs[0] : null;
+    const first = (cur === null ? '<option value="__mixed" selected disabled>Nhiều trọng tài</option>' : '')
+      + `<option value=""${cur === '' ? ' selected' : ''}>Chưa giao</option>`;
+    return `<label class="a-assign">Trọng tài bảng <select data-act="assign-group" data-ev="${e.id}" data-g="${g.group}">${refList(cur, first)}</select></label>`;
+  }
+  const names = refs.map(u => REF_NAME[u]).filter(Boolean);
+  return names.length ? `<div class="ref">Trọng tài: ${names.map(esc).join(', ')}</div>` : '';
+}
+
+function renderGroups() {
+  chips($('#groups-filter'), state.ev, v => { state.ev = v; save('pb-admin-ev', v); renderGroups(); });
+  const e = EVENTS[state.ev];
+  $('#groups-list').innerHTML = Object.values(view.standings[e.id]).map(g => {
+    const ms = view.matches.filter(m => m.event === e.id && m.stage === 'G' && m.group === g.group);
+    const mine = !me?.admin && ms.some(m => data.assign[m.id] === me?.uid);
+    const started = g.remaining < g.total;
+    return `<section class="group-block${mine ? ' mine-group' : ''}">
+    <article class="table-card">
+      <header><h3>Bảng ${g.group}${mine ? ' <span class="pill live">Bảng bạn bắt</span>' : ''}</h3><span class="muted small">${g.done ? 'Đã đấu xong' : `Còn ${g.remaining}/${g.total} trận`}</span></header>
+      <div class="group-ref">${groupHead(e, g, ms)}</div>
+      <table>
+        <thead><tr><th>#</th><th class="l">Cặp</th><th title="Số trận">Trận</th><th title="Thắng">T</th><th title="Thua">B</th><th title="Hiệu số">HS</th><th title="Điểm">Điểm</th></tr></thead>
+        <tbody>${g.rows.map(r => `<tr class="${r.rank <= 2 && started ? 'q' : ''}">
+          <td>${r.rank}</td><td class="l"><span class="code">${r.code}</span> ${esc(nameOf(t, e.id, r.code))}</td>
+          <td>${r.played}</td><td>${r.won}</td><td>${r.lost}</td><td>${r.diff > 0 ? '+' : ''}${r.diff}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody>
+      </table>
+      ${g.needsTiebreak ? '<p class="note">Bằng mọi chỉ số, nhánh đấu đang chờ BTC chốt thứ tự.</p>' : ''}
+    </article>
+    <div class="grid group-matches">${ms.map(card).join('')}</div>
+  </section>`;
+  }).join('');
+  if (me?.admin) renderTies(); else $('#ties').hidden = true;
+}
+
+// ---------- Tab Nhánh đấu
+function renderBracket() {
+  chips($('#bracket-filter'), state.bk, v => { state.bk = v; save('pb-admin-bk', v); renderBracket(); });
+  const ko = view.matches.filter(m => m.event === state.bk && m.stage !== 'G');
+  const cols = ['QF', 'SF', 'F'].map(s => ko.filter(m => m.stage === s)).filter(c => c.length);
+  $('#bracket-list').innerHTML = `<div class="bracket">${cols.map(c => `
+      <div class="col"><h3>${STAGE_TITLE[c[0].stage]}</h3><div class="slots">${c.map(card).join('')}</div></div>`).join('')}</div>`;
 }
 
 function renderTies() {
@@ -134,30 +195,37 @@ function renderTies() {
   }).join('');
 }
 
-function currentMatches() {
-  if (!me?.admin) return view.matches.filter(m => data.assign[m.id] === me?.uid);
-  return view.matches.filter(m => m.event === state.ev
-    && (state.grp === KO ? m.stage !== 'G' : m.stage === 'G' && m.group === state.grp));
-}
-
 function render() {
-  const admin = Boolean(me?.admin), known = admin || Boolean(me?.name);
-  document.querySelectorAll('[data-admin]').forEach(el => { el.hidden = !admin; });
+  const known = Boolean(me?.admin || me?.name);
   $('#no-role').hidden = !me || known;
-  $('#bulk').hidden = !admin || state.grp === KO;
-  $('#mine-title').hidden = admin || !known;
-  if (!known) { $('#list').innerHTML = ''; $('#ties').hidden = true; return; }
-  const ms = currentMatches();
-  if (!admin) $('#mine-title').textContent = `Trận giao cho ${me.name} (${ms.length})`;
-  $('#list').innerHTML = ms.map(card).join('')
-    || `<p class="empty">${admin ? 'Không có trận nào.' : 'Chưa có trận nào được giao cho bạn. Báo Ban tổ chức nhé.'}</p>`;
-  if (admin) renderTies(); else $('#ties').hidden = true;
+  document.querySelectorAll('.a-tabs, .view').forEach(el => el.classList.toggle('off', !known));
+  if (!known) return;
+  const mineCount = me.admin ? 0 : view.matches.filter(m => data.assign[m.id] === me.uid).length;
+  $('#mine-note').hidden = me.admin;
+  $('#mine-note').textContent = mineCount
+    ? `Bạn được giao ${mineCount} trận, có nút nhập điểm. Các trận khác chỉ xem.`
+    : 'Chưa có trận nào được giao cho bạn. Báo Ban tổ chức nhé.';
+  renderGroups();
+  renderBracket();
 }
 
-$('#list').addEventListener('click', e => {
+function showTab() {
+  const h = location.hash.slice(1);
+  const tab = TABS.includes(h) ? h : 'groups';
+  document.querySelectorAll('.view').forEach(v => { v.hidden = v.id !== `view-${tab}`; });
+  document.querySelectorAll('.a-tabs a').forEach(a => {
+    const on = a.getAttribute('href') === `#${tab}`;
+    a.classList.toggle('on', on);
+    if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+}
+
+// ---------- Thao tác
+$('#panel').addEventListener('click', e => {
   const b = e.target.closest('button[data-act]');
-  if (!b) return;
-  const id = b.closest('[data-id]').dataset.id;
+  const host = b?.closest('[data-id]');
+  if (!host) return;
+  const id = host.dataset.id;
   const cur = data.scores[id] ?? { s1: 0, s2: 0, status: 'live' };
   const put = v => track(store.setScore(id, v)).catch(fail);
   const act = b.dataset.act;
@@ -175,20 +243,20 @@ $('#list').addEventListener('click', e => {
   }
 });
 
-$('#list').addEventListener('change', e => {
-  const sel = e.target.closest('select[data-act="assign"]');
+$('#panel').addEventListener('change', e => {
+  const sel = e.target.closest('select[data-act]');
   if (!sel) return;
-  const id = sel.closest('[data-id]').dataset.id;
-  track(store.setAssign({ [id]: sel.value || null })).catch(fail);
-});
-
-$('#bulk-ref').addEventListener('change', e => {
-  const uid = e.target.value;
-  e.target.value = '';
-  if (!uid) return;
-  const ids = currentMatches().map(m => m.id);
-  track(store.setAssign(Object.fromEntries(ids.map(id => [id, uid]))))
-    .then(() => toast(`Đã giao ${ids.length} trận cho ${REF_NAME[uid]}`)).catch(fail);
+  if (sel.dataset.act === 'assign') {
+    const id = sel.closest('[data-id]').dataset.id;
+    track(store.setAssign({ [id]: sel.value || null })).catch(fail);
+  }
+  if (sel.dataset.act === 'assign-group') {
+    const { ev, g } = sel.dataset;
+    const ids = t.matches.filter(m => m.event === ev && m.stage === 'G' && m.group === g).map(m => m.id);
+    const uid = sel.value || null;
+    track(store.setAssign(Object.fromEntries(ids.map(id => [id, uid]))))
+      .then(() => toast(uid ? `Đã giao bảng ${g} (${ids.length} trận) cho ${REF_NAME[uid]}` : `Đã bỏ giao bảng ${g}`)).catch(fail);
+  }
 });
 
 $('#ties-list').addEventListener('click', e => {
@@ -217,14 +285,26 @@ $('#login-form').addEventListener('submit', async e => {
 });
 $('#logout').onclick = () => store.signOut();
 
+// Trọng tài mở trang: nhảy tới nội dung có trận của mình (một lần mỗi lần đăng nhập)
+let focused = false;
+function focusMine() {
+  if (focused || !me || me.admin) return;
+  const m = view.matches.find(x => data.assign[x.id] === me.uid);
+  if (!m) return;
+  state.ev = m.event; state.bk = m.event;
+  focused = true;
+}
+
 $('#demo-note').hidden = !store.demo;
-buildFilters();
-$('#bulk-ref').innerHTML = refOptions(null, 'Chọn trọng tài…');
+addEventListener('hashchange', showTab);
+showTab();
 store.onAuth(user => {
   me = whoIs(user);
+  focused = false;
   $('#login').hidden = Boolean(user);
   $('#panel').hidden = !user;
   $('#who').textContent = me ? (me.name ?? user.email) : '';
+  focusMine();
   render();
 });
 store.onConnection(on => {
@@ -233,4 +313,9 @@ store.onConnection(on => {
   online = on;
   renderConn();
 });
-store.onData(d => { data = d; view = buildView(t, d.scores, d.overrides); render(); });
+store.onData(d => {
+  data = d;
+  view = buildView(t, d.scores, d.overrides);
+  focusMine();
+  render();
+});
