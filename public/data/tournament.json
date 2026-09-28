@@ -1,0 +1,1002 @@
+{
+ "title": "Giải Pickleball EVNICT 2026",
+ "subtitle": "Giải thể thao thường niên EVNICT 2026",
+ "date": "2026-10-04",
+ "dateText": "Chủ nhật, 04/10/2026",
+ "venue": "Hà Nội",
+ "hours": "7h00 – 12h00",
+ "courts": 6,
+ "endTime": "11:57",
+ "rounds": {
+  "1": "07:00",
+  "2": "07:18",
+  "3": "07:36",
+  "4": "07:54",
+  "5": "08:12",
+  "6": "08:30",
+  "7": "08:53",
+  "8": "09:11",
+  "9": "09:29",
+  "10": "09:52",
+  "11": "10:17",
+  "12": "10:42",
+  "13": "11:07",
+  "14": "11:32"
+ },
+ "events": [
+  {
+   "id": "MD",
+   "name": "Đôi Nam",
+   "groups": {
+    "A": [
+     "A1",
+     "A2",
+     "A3",
+     "A4"
+    ],
+    "B": [
+     "B1",
+     "B2",
+     "B3",
+     "B4"
+    ],
+    "C": [
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "D": [
+     "D1",
+     "D2",
+     "D3"
+    ]
+   },
+   "teams": {
+    "A1": [
+     "Trần Công Hân",
+     "Lê Văn Ninh"
+    ],
+    "A2": [
+     "Nguyễn Xuân Khải",
+     "Nguyễn Anh Tú"
+    ],
+    "A3": [
+     "Trương Anh Tiến",
+     "Hoàng Mạnh Hùng"
+    ],
+    "A4": [
+     "Nguyễn Long Anh",
+     "Bùi Phú Định"
+    ],
+    "B1": [
+     "Nguyễn Trung Hiếu",
+     "Vũ Quang Hoàng Anh"
+    ],
+    "B2": [
+     "Hoàng Minh Ngọc",
+     "Nguyễn Dương Mạnh Dũng"
+    ],
+    "B3": [
+     "Nguyễn Văn Hưng",
+     "Nguyễn Văn Ánh"
+    ],
+    "B4": [
+     "Trịnh Ngọc Liên",
+     "Đinh Công Bằng"
+    ],
+    "C1": [
+     "Kiều Thanh Duy",
+     "Phạm Văn Sỹ"
+    ],
+    "C2": [
+     "Lê Hoàng Anh",
+     "Hoàng Bảo An"
+    ],
+    "C3": [
+     "Đỗ Trung Dũng",
+     "Dương Tuấn Linh"
+    ],
+    "D1": [
+     "Nguyễn Thanh Long",
+     "Nguyễn Thanh Bằng"
+    ],
+    "D2": [
+     "Trần Ngọc Khánh",
+     "Nguyễn Ngọc Minh"
+    ],
+    "D3": [
+     "Đào Quang Hưng",
+     "Hoàng Gia Linh"
+    ]
+   }
+  },
+  {
+   "id": "XD",
+   "name": "Đôi Nam - Nữ",
+   "groups": {
+    "A": [
+     "A1",
+     "A2",
+     "A3",
+     "A4"
+    ],
+    "B": [
+     "B1",
+     "B2",
+     "B3",
+     "B4"
+    ],
+    "C": [
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "D": [
+     "D1",
+     "D2",
+     "D3"
+    ]
+   },
+   "teams": {
+    "A1": [
+     "Đào Quang Hưng",
+     "Trần Thị Thu Huyền"
+    ],
+    "A2": [
+     "Nguyễn Thanh Long",
+     "Nguyễn Thị Thu Hà"
+    ],
+    "A3": [
+     "Vũ Quang Hoàng Anh",
+     "Nguyễn Thị Nga"
+    ],
+    "A4": [
+     "Nguyễn Long Anh",
+     "Trần Hoàng Yến"
+    ],
+    "B1": [
+     "Đỗ Trung Dũng",
+     "Nguyễn Thị Hải Hà"
+    ],
+    "B2": [
+     "Trịnh Ngọc Liên",
+     "Lê Thị Kim Ngọc"
+    ],
+    "B3": [
+     "Lê Hoàng Anh",
+     "Nguyễn Thị Bích Ngọc"
+    ],
+    "B4": [
+     "Kiều Thanh Duy",
+     "Hoàng Thị Thu Khánh"
+    ],
+    "C1": [
+     "Nguyễn Văn Nhân",
+     "Ngô Thị Hồng Ngọc"
+    ],
+    "C2": [
+     "Phạm Văn Sỹ",
+     "Phạm Thị Mai"
+    ],
+    "C3": [
+     "Nguyễn Trung Hiếu",
+     "Nguyễn Thị Mai Hương"
+    ],
+    "D1": [
+     "Trương Anh Tiến",
+     "Nguyễn Thị Hạnh"
+    ],
+    "D2": [
+     "Nguyễn Văn Hưng",
+     "Phạm Thị Thu Hương"
+    ],
+    "D3": [
+     "Nguyễn Ngọc Minh",
+     "Trần Thị Thanh Loan"
+    ]
+   }
+  },
+  {
+   "id": "WD",
+   "name": "Đôi Nữ",
+   "groups": {
+    "A": [
+     "A1",
+     "A2",
+     "A3",
+     "A4"
+    ],
+    "B": [
+     "B1",
+     "B2",
+     "B3"
+    ]
+   },
+   "teams": {
+    "A1": [
+     "Trần Thị Thanh Loan",
+     "Phạm Thị Thu Hương"
+    ],
+    "A2": [
+     "Nguyễn Thị Hạnh",
+     "Lê Thị Kim Ngọc"
+    ],
+    "A3": [
+     "Phạm Thị Mai",
+     "Nguyễn Thị Thu Hà"
+    ],
+    "A4": [
+     "Nguyễn Thị Nga",
+     "Hoàng Thị Thu Khánh"
+    ],
+    "B1": [
+     "Trần Thị Thu Huyền",
+     "Nguyễn Thị Mai Hương"
+    ],
+    "B2": [
+     "Trần Hoàng Yến",
+     "Nguyễn Thị Hải Hà"
+    ],
+    "B3": [
+     "Ngô Thị Hồng Ngọc",
+     "Nguyễn Thị Bích Ngọc"
+    ]
+   }
+  }
+ ],
+ "matches": [
+  {
+   "id": "MD-G01",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 1,
+   "court": 1,
+   "t1": "A1",
+   "t2": "A2"
+  },
+  {
+   "id": "MD-G02",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 2,
+   "court": 1,
+   "t1": "A3",
+   "t2": "A4"
+  },
+  {
+   "id": "MD-G03",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 3,
+   "court": 1,
+   "t1": "A1",
+   "t2": "A3"
+  },
+  {
+   "id": "MD-G04",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 4,
+   "court": 1,
+   "t1": "A2",
+   "t2": "A4"
+  },
+  {
+   "id": "MD-G05",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 5,
+   "court": 1,
+   "t1": "A1",
+   "t2": "A4"
+  },
+  {
+   "id": "MD-G06",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 6,
+   "court": 1,
+   "t1": "A2",
+   "t2": "A3"
+  },
+  {
+   "id": "MD-G07",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 1,
+   "court": 2,
+   "t1": "B1",
+   "t2": "B2"
+  },
+  {
+   "id": "MD-G08",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 2,
+   "court": 2,
+   "t1": "B3",
+   "t2": "B4"
+  },
+  {
+   "id": "MD-G09",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 3,
+   "court": 2,
+   "t1": "B1",
+   "t2": "B3"
+  },
+  {
+   "id": "MD-G10",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 4,
+   "court": 2,
+   "t1": "B2",
+   "t2": "B4"
+  },
+  {
+   "id": "MD-G11",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 5,
+   "court": 2,
+   "t1": "B1",
+   "t2": "B4"
+  },
+  {
+   "id": "MD-G12",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 6,
+   "court": 2,
+   "t1": "B2",
+   "t2": "B3"
+  },
+  {
+   "id": "MD-G13",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng C",
+   "group": "C",
+   "round": 1,
+   "court": 3,
+   "t1": "C1",
+   "t2": "C2"
+  },
+  {
+   "id": "MD-G14",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng C",
+   "group": "C",
+   "round": 2,
+   "court": 3,
+   "t1": "C1",
+   "t2": "C3"
+  },
+  {
+   "id": "MD-G15",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng C",
+   "group": "C",
+   "round": 3,
+   "court": 3,
+   "t1": "C2",
+   "t2": "C3"
+  },
+  {
+   "id": "MD-G16",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng D",
+   "group": "D",
+   "round": 1,
+   "court": 4,
+   "t1": "D1",
+   "t2": "D2"
+  },
+  {
+   "id": "MD-G17",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng D",
+   "group": "D",
+   "round": 2,
+   "court": 4,
+   "t1": "D1",
+   "t2": "D3"
+  },
+  {
+   "id": "MD-G18",
+   "event": "MD",
+   "stage": "G",
+   "label": "Bảng D",
+   "group": "D",
+   "round": 3,
+   "court": 4,
+   "t1": "D2",
+   "t2": "D3"
+  },
+  {
+   "id": "MD-QF1",
+   "event": "MD",
+   "stage": "QF",
+   "label": "Tứ kết 1",
+   "round": 10,
+   "court": 1,
+   "src1": {
+    "group": "A",
+    "rank": 1
+   },
+   "src2": {
+    "group": "B",
+    "rank": 2
+   }
+  },
+  {
+   "id": "MD-QF2",
+   "event": "MD",
+   "stage": "QF",
+   "label": "Tứ kết 2",
+   "round": 10,
+   "court": 2,
+   "src1": {
+    "group": "C",
+    "rank": 1
+   },
+   "src2": {
+    "group": "D",
+    "rank": 2
+   }
+  },
+  {
+   "id": "MD-QF3",
+   "event": "MD",
+   "stage": "QF",
+   "label": "Tứ kết 3",
+   "round": 10,
+   "court": 3,
+   "src1": {
+    "group": "B",
+    "rank": 1
+   },
+   "src2": {
+    "group": "A",
+    "rank": 2
+   }
+  },
+  {
+   "id": "MD-QF4",
+   "event": "MD",
+   "stage": "QF",
+   "label": "Tứ kết 4",
+   "round": 10,
+   "court": 4,
+   "src1": {
+    "group": "D",
+    "rank": 1
+   },
+   "src2": {
+    "group": "C",
+    "rank": 2
+   }
+  },
+  {
+   "id": "MD-SF1",
+   "event": "MD",
+   "stage": "SF",
+   "label": "Bán kết 1",
+   "round": 11,
+   "court": 1,
+   "src1": {
+    "winner": "MD-QF1"
+   },
+   "src2": {
+    "winner": "MD-QF2"
+   }
+  },
+  {
+   "id": "MD-SF2",
+   "event": "MD",
+   "stage": "SF",
+   "label": "Bán kết 2",
+   "round": 11,
+   "court": 2,
+   "src1": {
+    "winner": "MD-QF3"
+   },
+   "src2": {
+    "winner": "MD-QF4"
+   }
+  },
+  {
+   "id": "MD-F",
+   "event": "MD",
+   "stage": "F",
+   "label": "Chung kết",
+   "round": 13,
+   "court": 3,
+   "src1": {
+    "winner": "MD-SF1"
+   },
+   "src2": {
+    "winner": "MD-SF2"
+   }
+  },
+  {
+   "id": "XD-G01",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 7,
+   "court": 1,
+   "t1": "A1",
+   "t2": "A2"
+  },
+  {
+   "id": "XD-G02",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 7,
+   "court": 2,
+   "t1": "A3",
+   "t2": "A4"
+  },
+  {
+   "id": "XD-G03",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 8,
+   "court": 1,
+   "t1": "A1",
+   "t2": "A3"
+  },
+  {
+   "id": "XD-G04",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 8,
+   "court": 2,
+   "t1": "A2",
+   "t2": "A4"
+  },
+  {
+   "id": "XD-G05",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 9,
+   "court": 1,
+   "t1": "A1",
+   "t2": "A4"
+  },
+  {
+   "id": "XD-G06",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 9,
+   "court": 2,
+   "t1": "A2",
+   "t2": "A3"
+  },
+  {
+   "id": "XD-G07",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 7,
+   "court": 3,
+   "t1": "B1",
+   "t2": "B2"
+  },
+  {
+   "id": "XD-G08",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 7,
+   "court": 4,
+   "t1": "B3",
+   "t2": "B4"
+  },
+  {
+   "id": "XD-G09",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 8,
+   "court": 3,
+   "t1": "B1",
+   "t2": "B3"
+  },
+  {
+   "id": "XD-G10",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 8,
+   "court": 4,
+   "t1": "B2",
+   "t2": "B4"
+  },
+  {
+   "id": "XD-G11",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 9,
+   "court": 3,
+   "t1": "B1",
+   "t2": "B4"
+  },
+  {
+   "id": "XD-G12",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 9,
+   "court": 4,
+   "t1": "B2",
+   "t2": "B3"
+  },
+  {
+   "id": "XD-G13",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng C",
+   "group": "C",
+   "round": 7,
+   "court": 5,
+   "t1": "C1",
+   "t2": "C2"
+  },
+  {
+   "id": "XD-G14",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng C",
+   "group": "C",
+   "round": 8,
+   "court": 5,
+   "t1": "C1",
+   "t2": "C3"
+  },
+  {
+   "id": "XD-G15",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng C",
+   "group": "C",
+   "round": 9,
+   "court": 5,
+   "t1": "C2",
+   "t2": "C3"
+  },
+  {
+   "id": "XD-G16",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng D",
+   "group": "D",
+   "round": 7,
+   "court": 6,
+   "t1": "D1",
+   "t2": "D2"
+  },
+  {
+   "id": "XD-G17",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng D",
+   "group": "D",
+   "round": 8,
+   "court": 6,
+   "t1": "D1",
+   "t2": "D3"
+  },
+  {
+   "id": "XD-G18",
+   "event": "XD",
+   "stage": "G",
+   "label": "Bảng D",
+   "group": "D",
+   "round": 9,
+   "court": 6,
+   "t1": "D2",
+   "t2": "D3"
+  },
+  {
+   "id": "XD-QF1",
+   "event": "XD",
+   "stage": "QF",
+   "label": "Tứ kết 1",
+   "round": 12,
+   "court": 1,
+   "src1": {
+    "group": "A",
+    "rank": 1
+   },
+   "src2": {
+    "group": "B",
+    "rank": 2
+   }
+  },
+  {
+   "id": "XD-QF2",
+   "event": "XD",
+   "stage": "QF",
+   "label": "Tứ kết 2",
+   "round": 12,
+   "court": 2,
+   "src1": {
+    "group": "C",
+    "rank": 1
+   },
+   "src2": {
+    "group": "D",
+    "rank": 2
+   }
+  },
+  {
+   "id": "XD-QF3",
+   "event": "XD",
+   "stage": "QF",
+   "label": "Tứ kết 3",
+   "round": 12,
+   "court": 3,
+   "src1": {
+    "group": "B",
+    "rank": 1
+   },
+   "src2": {
+    "group": "A",
+    "rank": 2
+   }
+  },
+  {
+   "id": "XD-QF4",
+   "event": "XD",
+   "stage": "QF",
+   "label": "Tứ kết 4",
+   "round": 12,
+   "court": 4,
+   "src1": {
+    "group": "D",
+    "rank": 1
+   },
+   "src2": {
+    "group": "C",
+    "rank": 2
+   }
+  },
+  {
+   "id": "XD-SF1",
+   "event": "XD",
+   "stage": "SF",
+   "label": "Bán kết 1",
+   "round": 13,
+   "court": 1,
+   "src1": {
+    "winner": "XD-QF1"
+   },
+   "src2": {
+    "winner": "XD-QF2"
+   }
+  },
+  {
+   "id": "XD-SF2",
+   "event": "XD",
+   "stage": "SF",
+   "label": "Bán kết 2",
+   "round": 13,
+   "court": 2,
+   "src1": {
+    "winner": "XD-QF3"
+   },
+   "src2": {
+    "winner": "XD-QF4"
+   }
+  },
+  {
+   "id": "XD-F",
+   "event": "XD",
+   "stage": "F",
+   "label": "Chung kết",
+   "round": 14,
+   "court": 1,
+   "src1": {
+    "winner": "XD-SF1"
+   },
+   "src2": {
+    "winner": "XD-SF2"
+   }
+  },
+  {
+   "id": "WD-G01",
+   "event": "WD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 1,
+   "court": 5,
+   "t1": "A1",
+   "t2": "A2"
+  },
+  {
+   "id": "WD-G02",
+   "event": "WD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 2,
+   "court": 5,
+   "t1": "A3",
+   "t2": "A4"
+  },
+  {
+   "id": "WD-G03",
+   "event": "WD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 3,
+   "court": 5,
+   "t1": "A1",
+   "t2": "A3"
+  },
+  {
+   "id": "WD-G04",
+   "event": "WD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 4,
+   "court": 5,
+   "t1": "A2",
+   "t2": "A4"
+  },
+  {
+   "id": "WD-G05",
+   "event": "WD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 5,
+   "court": 5,
+   "t1": "A1",
+   "t2": "A4"
+  },
+  {
+   "id": "WD-G06",
+   "event": "WD",
+   "stage": "G",
+   "label": "Bảng A",
+   "group": "A",
+   "round": 6,
+   "court": 5,
+   "t1": "A2",
+   "t2": "A3"
+  },
+  {
+   "id": "WD-G07",
+   "event": "WD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 1,
+   "court": 6,
+   "t1": "B1",
+   "t2": "B2"
+  },
+  {
+   "id": "WD-G08",
+   "event": "WD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 2,
+   "court": 6,
+   "t1": "B1",
+   "t2": "B3"
+  },
+  {
+   "id": "WD-G09",
+   "event": "WD",
+   "stage": "G",
+   "label": "Bảng B",
+   "group": "B",
+   "round": 3,
+   "court": 6,
+   "t1": "B2",
+   "t2": "B3"
+  },
+  {
+   "id": "WD-SF1",
+   "event": "WD",
+   "stage": "SF",
+   "label": "Bán kết 1",
+   "round": 10,
+   "court": 5,
+   "src1": {
+    "group": "A",
+    "rank": 1
+   },
+   "src2": {
+    "group": "B",
+    "rank": 2
+   }
+  },
+  {
+   "id": "WD-SF2",
+   "event": "WD",
+   "stage": "SF",
+   "label": "Bán kết 2",
+   "round": 10,
+   "court": 6,
+   "src1": {
+    "group": "B",
+    "rank": 1
+   },
+   "src2": {
+    "group": "A",
+    "rank": 2
+   }
+  },
+  {
+   "id": "WD-F",
+   "event": "WD",
+   "stage": "F",
+   "label": "Chung kết",
+   "round": 11,
+   "court": 3,
+   "src1": {
+    "winner": "WD-SF1"
+   },
+   "src2": {
+    "winner": "WD-SF2"
+   }
+  }
+ ]
+}

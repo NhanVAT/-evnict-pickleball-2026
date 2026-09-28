@@ -1,0 +1,12 @@
+{
+  "name": "evnict-pickleball",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"tests/*.test.mjs\"",
+    "export": "python tools/export_excel.py \"../Danh sách thi đấu chính thức Pickerball giải thể thao thường niên EVNICT 2026.xlsx\" public/data/tournament.json",
+    "serve": "npx --yes http-server public -p 5173 -c-1 --silent",
+    "predeploy": "node -e \"if(require('fs').readFileSync('database.rules.json','utf8').includes('__ADMIN_UID__'))throw new Error('Chưa điền ADMIN UID vào database.rules.json')\"",
+    "deploy": "npx --yes firebase-tools deploy --only hosting,database"
+  }
+}
