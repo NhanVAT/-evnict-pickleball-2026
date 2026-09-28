@@ -118,3 +118,10 @@ Repo chỉ chứa thư mục `web/`; không đưa file docx/xlsx gốc, thư m�
 - Kiểm luật bảo mật: ghi khi chưa đăng nhập phải bị từ chối.
 - Chạy thử đầu-cuối trên trình duyệt: admin nhập vài trận, trang người xem ở tab khác cập nhật; kiểm giao diện ở 360px.
 - Tổng duyệt trước ngày thi đấu, xóa sạch `/scores` và `/overrides` trước 7h00 ngày 04/10.
+
+## 8. Thay đổi ngày 28/09 (theo góp ý người dùng)
+
+- Trang VĐV còn 3 tab: **Tổng quan**, **Bảng đấu**, **Nhánh đấu**. "Bảng đấu" gộp Lịch đấu + Xếp hạng: mỗi bảng có bảng xếp hạng ở trên, các trận của bảng ở dưới (theo thứ tự thi đấu trong Excel). Tìm tên VĐV tô sáng dòng và trận của cặp đó, không ẩn trận khác.
+- Bỏ hiển thị lượt và giờ ở mọi nơi; giữ số sân (6 sân). Tổng quan bỏ khối "Sắp đấu".
+- Admin lọc theo **Nội dung + Bảng** (Bảng A–D hoặc Loại trực tiếp) thay cho lượt.
+- Để sau: 6 tài khoản trọng tài, admin giao trận cho từng trọng tài; luật bảo mật cho mỗi trọng tài chỉ ghi trận được giao.

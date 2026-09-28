@@ -25,20 +25,15 @@
 </header>
 <nav class="tabs" aria-label="Mục">
   <a href="#home">Tổng quan</a>
-  <a href="#schedule">Lịch đấu</a>
-  <a href="#standings">Xếp hạng</a>
+  <a href="#groups">Bảng đấu</a>
   <a href="#bracket">Nhánh đấu</a>
 </nav>
 <main>
   <section class="view" id="view-home"></section>
-  <section class="view" id="view-schedule" hidden>
-    <div class="controls"><input id="search" type="search" placeholder="Gõ tên bạn để xem trận của mình (không dấu cũng được)" autocomplete="off" aria-label="Tìm theo tên vận động viên"></div>
-    <div class="chips" id="schedule-filter"></div>
-    <div id="schedule-list"></div>
-  </section>
-  <section class="view" id="view-standings" hidden>
-    <div class="chips" id="standings-filter"></div>
-    <div id="standings-list"></div>
+  <section class="view" id="view-groups" hidden>
+    <div class="controls"><input id="search" type="search" placeholder="Gõ tên bạn để tô sáng trận của mình (không dấu cũng được)" autocomplete="off" aria-label="Tìm theo tên vận động viên"></div>
+    <div class="chips" id="groups-filter"></div>
+    <div id="groups-list"></div>
   </section>
   <section class="view" id="view-bracket" hidden>
     <div class="chips" id="bracket-filter"></div>

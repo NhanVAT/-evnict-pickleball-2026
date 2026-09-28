@@ -1,6 +1,6 @@
 import { buildView, nameOf } from './engine.js';
 import { createStore } from './store.js';
-import { esc, load, save, byRoundCourt } from './util.js';
+import { esc, load, save } from './util.js';
 
 const $ = s => document.querySelector(s);
 const t = await fetch('data/tournament.json', { cache: 'no-cache' }).then(r => r.json());
@@ -20,7 +20,11 @@ fatal('');
 
 let data = { scores: {}, overrides: {} };
 let view = buildView(t);
-const state = { ev: load('pb-admin-ev', 'ALL'), round: load('pb-admin-round', 'auto') };
+const KO = 'KO'; // mục "Loại trực tiếp" trong bộ lọc bảng
+const groupsOf = ev => [...Object.keys(EVENTS[ev].groups), KO];
+const state = { ev: load('pb-admin-ev', 'MD'), grp: load('pb-admin-grp', 'A') };
+if (!EVENTS[state.ev]) state.ev = 'MD';
+if (!groupsOf(state.ev).includes(state.grp)) state.grp = 'A';
 let armed = null; // id trận đang chờ bấm lần 2 để xóa tỷ số
 const drafts = new Map(); // "ev/g" → thứ tự đang sắp dở ở khu bằng điểm, giữ qua các lần vẽ lại
 let online = false, everConnected = false, pending = 0;
@@ -44,21 +48,23 @@ function toast(msg) {
 }
 const fail = err => toast(`Không lưu được: ${err.code ?? err.message}`);
 
-function currentRound() {
-  const open = view.matches.filter(m => m.status !== 'done').map(m => m.round);
-  return open.length ? Math.min(...open) : Math.max(...t.matches.map(m => m.round));
+// Select chỉ dựng một lần để không đóng picker trên điện thoại khi dữ liệu đổi
+function buildGroupOptions() {
+  $('#f-grp').innerHTML = groupsOf(state.ev)
+    .map(g => `<option value="${g}">${g === KO ? 'Loại trực tiếp' : `Bảng ${g}`}</option>`).join('');
+  $('#f-grp').value = state.grp;
 }
 
-// Select chỉ dựng một lần để không đóng picker trên điện thoại khi dữ liệu đổi
 function buildFilters() {
-  $('#f-ev').innerHTML = [['ALL', 'Tất cả nội dung'], ...t.events.map(e => [e.id, e.name])]
-    .map(([v, n]) => `<option value="${v}">${esc(n)}</option>`).join('');
-  $('#f-round').innerHTML = '<option value="auto" id="opt-auto"></option><option value="all">Tất cả lượt</option>'
-    + Object.entries(t.rounds).map(([r, time]) => `<option value="${r}">Lượt ${r}, ${time}</option>`).join('');
+  $('#f-ev').innerHTML = t.events.map(e => `<option value="${e.id}">${esc(e.name)}</option>`).join('');
   $('#f-ev').value = state.ev;
-  $('#f-round').value = state.round;
-  $('#f-ev').onchange = e => { state.ev = e.target.value; save('pb-admin-ev', state.ev); render(); };
-  $('#f-round').onchange = e => { state.round = e.target.value; save('pb-admin-round', state.round); render(); };
+  buildGroupOptions();
+  $('#f-ev').onchange = e => {
+    state.ev = e.target.value; save('pb-admin-ev', state.ev);
+    if (!groupsOf(state.ev).includes(state.grp)) { state.grp = 'A'; save('pb-admin-grp', state.grp); }
+    buildGroupOptions(); render();
+  };
+  $('#f-grp').onchange = e => { state.grp = e.target.value; save('pb-admin-grp', state.grp); render(); };
 }
 
 function card(m) {
@@ -81,7 +87,7 @@ function card(m) {
       : `<button data-act="reopen">Sửa lại</button>${clear}`;
   const pill = m.status === 'live' ? '<span class="pill live">Đang đấu</span>' : m.status === 'done' ? '<span class="pill">Đã xong</span>' : '';
   return `<article class="a-match ${m.status}" data-id="${m.id}">
-    <div class="match-meta"><span class="court-no">Sân ${m.court}</span><b>Lượt ${m.round}, ${t.rounds[m.round]}</b><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${pill}</div>
+    <div class="match-meta"><span class="court-no">Sân ${m.court}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${pill}</div>
     ${side(1)}${side(2)}
     <div class="a-actions">${actions}</div>
   </article>`;
@@ -110,13 +116,9 @@ function renderTies() {
 }
 
 function render() {
-  const cur = currentRound();
-  $('#opt-auto').textContent = `Lượt hiện tại (${cur})`;
-  const round = state.round === 'auto' ? cur : Number(state.round);
-  const ms = view.matches
-    .filter(m => (state.ev === 'ALL' || m.event === state.ev) && (state.round === 'all' || m.round === round))
-    .sort(byRoundCourt);
-  $('#list').innerHTML = ms.map(card).join('') || '<p class="empty">Lượt này không có trận của nội dung đã chọn.</p>';
+  const ms = view.matches.filter(m => m.event === state.ev
+    && (state.grp === KO ? m.stage !== 'G' : m.stage === 'G' && m.group === state.grp));
+  $('#list').innerHTML = ms.map(card).join('') || '<p class="empty">Không có trận nào.</p>';
   renderTies();
 }
 

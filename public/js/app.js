@@ -5,11 +5,12 @@ import { esc, normalize, load, save, byRoundCourt } from './util.js';
 const $ = s => document.querySelector(s);
 const t = await fetch('data/tournament.json', { cache: 'no-cache' }).then(r => r.json());
 const EVENTS = Object.fromEntries(t.events.map(e => [e.id, e]));
-const TABS = ['home', 'schedule', 'standings', 'bracket'];
+const TABS = ['home', 'groups', 'bracket'];
+const OLD_TABS = { schedule: 'groups', standings: 'groups' }; // link cũ vẫn mở đúng tab
 const STAGE_TITLE = { QF: 'Tứ kết', SF: 'Bán kết', F: 'Chung kết' };
 
 const state = {
-  sched: load('pb-sched', 'ALL'), stand: load('pb-stand', 'MD'), bracket: load('pb-bracket', 'MD'), q: load('pb-q', ''),
+  grp: load('pb-grp', 'MD'), bracket: load('pb-bracket', 'MD'), q: load('pb-q', ''),
 };
 let view = buildView(t);
 
@@ -29,7 +30,7 @@ function side(m, n) {
 
 function matchCard(m, mine = false) {
   return `<article class="match ${m.status}${mine ? ' mine' : ''}">
-    <div class="match-meta"><span class="court-no">Sân ${m.court}</span><span>${t.rounds[m.round]}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${statusPill(m)}</div>
+    <div class="match-meta"><span class="court-no">Sân ${m.court}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${statusPill(m)}</div>
     ${side(m, 1)}${side(m, 2)}
   </article>`;
 }
@@ -54,9 +55,6 @@ function chips(el, value, withAll, onPick) {
 // ---------- Các tab
 function renderHome() {
   const live = view.matches.filter(m => m.status === 'live').sort(byRoundCourt);
-  const pending = view.matches.filter(m => m.status === 'pending');
-  const next = pending.length ? Math.min(...pending.map(m => m.round)) : null;
-  const upcoming = pending.filter(m => m.round === next).sort(byRoundCourt);
   const doneCount = view.matches.filter(m => m.status === 'done').length;
   const podiums = t.events.map(podiumCard).join('');
   $('#view-home').innerHTML = `
@@ -64,7 +62,6 @@ function renderHome() {
     ${podiums ? `<h2 class="sec">Kết quả chung cuộc</h2><div class="grid">${podiums}</div>` : ''}
     <h2 class="sec">Đang diễn ra ${live.length ? `<span class="count">${live.length}</span>` : ''}</h2>
     ${live.length ? `<div class="grid">${live.map(m => matchCard(m)).join('')}</div>` : '<p class="empty">Chưa có trận nào đang đấu.</p>'}
-    ${next ? `<h2 class="sec">Sắp đấu: lượt ${next} <span class="time">${t.rounds[next]}</span></h2><div class="grid">${upcoming.map(m => matchCard(m)).join('')}</div>` : ''}
     <h2 class="sec">Thông tin giải</h2>
     <dl class="info">
       <div><dt>Ngày thi đấu</dt><dd>${esc(t.dateText)}</dd></div>
@@ -75,32 +72,28 @@ function renderHome() {
     </dl>`;
 }
 
-function renderSchedule() {
-  chips($('#schedule-filter'), state.sched, true, v => { state.sched = v; save('pb-sched', v); renderSchedule(); });
+function renderGroups() {
+  chips($('#groups-filter'), state.grp, false, v => { state.grp = v; save('pb-grp', v); renderGroups(); });
+  const e = EVENTS[state.grp];
   const q = normalize(state.q.trim());
-  let ms = view.matches.filter(m => state.sched === 'ALL' || m.event === state.sched);
-  if (q) ms = ms.filter(m => [m.team1, m.team2].some(c => c && normalize(nameOf(t, m.event, c)).includes(q)));
-  const rounds = [...new Set(ms.map(m => m.round))].sort((a, b) => a - b);
-  $('#schedule-list').innerHTML = rounds.length
-    ? rounds.map(r => `<h2 class="sec">Lượt ${r} <span class="time">${t.rounds[r]}</span></h2>
-        <div class="grid">${ms.filter(m => m.round === r).sort(byRoundCourt).map(m => matchCard(m, Boolean(q))).join('')}</div>`).join('')
-    : `<p class="empty">Không có trận nào${q ? ` của “${esc(state.q)}”. Thử gõ tên ngắn hơn, ví dụ chỉ tên riêng` : ''}.</p>`;
-}
-
-function renderStandings() {
-  chips($('#standings-filter'), state.stand, false, v => { state.stand = v; save('pb-stand', v); renderStandings(); });
-  const e = EVENTS[state.stand];
-  $('#standings-list').innerHTML = Object.values(view.standings[e.id]).map(g => `
+  const isMe = code => Boolean(q) && normalize(nameOf(t, e.id, code)).includes(q);
+  $('#groups-list').innerHTML = Object.values(view.standings[e.id]).map(g => {
+    const started = g.remaining < g.total;
+    const ms = view.matches.filter(m => m.event === e.id && m.stage === 'G' && m.group === g.group);
+    return `<section class="group-block">
     <article class="table-card">
       <header><h3>Bảng ${g.group}</h3><span class="muted small">${g.done ? 'Đã đấu xong' : `Còn ${g.remaining}/${g.total} trận`}</span></header>
       <table>
         <thead><tr><th>#</th><th class="l">Cặp</th><th title="Số trận">Trận</th><th title="Thắng">T</th><th title="Thua">B</th><th title="Hiệu số">HS</th><th title="Điểm">Điểm</th></tr></thead>
-        <tbody>${g.rows.map(r => `<tr class="${r.rank <= 2 && g.remaining < g.total ? 'q' : ''}">
+        <tbody>${g.rows.map(r => `<tr class="${r.rank <= 2 && started ? 'q' : ''}${isMe(r.code) ? ' me' : ''}">
           <td>${r.rank}</td><td class="l"><span class="code">${r.code}</span> ${esc(nameOf(t, e.id, r.code))}</td>
           <td>${r.played}</td><td>${r.won}</td><td>${r.lost}</td><td>${r.diff > 0 ? '+' : ''}${r.diff}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody>
       </table>
       ${g.needsTiebreak ? '<p class="note">Có đội bằng nhau mọi chỉ số, Ban tổ chức đang xác định thứ hạng.</p>' : ''}
-    </article>`).join('')
+    </article>
+    <div class="grid group-matches">${ms.map(m => matchCard(m, isMe(m.t1) || isMe(m.t2))).join('')}</div>
+  </section>`;
+  }).join('')
     + '<p class="muted small">Thắng được 3 điểm. Bằng điểm thì xét hiệu số, rồi tổng điểm ghi được. Nhất và nhì mỗi bảng (dòng tô màu) vào vòng loại trực tiếp.</p>';
 }
 
@@ -114,10 +107,11 @@ function renderBracket() {
     </div>${podiumCard(e)}`;
 }
 
-function render() { renderHome(); renderSchedule(); renderStandings(); renderBracket(); }
+function render() { renderHome(); renderGroups(); renderBracket(); }
 
 function showTab() {
-  const tab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
+  const h = location.hash.slice(1);
+  const tab = TABS.includes(h) ? h : OLD_TABS[h] ?? 'home';
   document.querySelectorAll('.view').forEach(v => { v.hidden = v.id !== `view-${tab}`; });
   document.querySelectorAll('.tabs a').forEach(a => {
     const on = a.getAttribute('href') === `#${tab}`;
@@ -131,7 +125,7 @@ $('#hero-meta').innerHTML = [t.dateText, t.hours, `${t.venue}, ${t.courts} sân`
   .map(s => `<span>${esc(s)}</span>`).join('');
 const search = $('#search');
 search.value = state.q;
-search.addEventListener('input', () => { state.q = search.value; save('pb-q', state.q); renderSchedule(); });
+search.addEventListener('input', () => { state.q = search.value; save('pb-q', state.q); renderGroups(); });
 addEventListener('hashchange', showTab);
 showTab();
 render();
