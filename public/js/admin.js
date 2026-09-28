@@ -67,8 +67,8 @@ function toast(msg) {
 }
 const fail = err => toast(`Không lưu được: ${err.code ?? err.message}`);
 
-function chips(el, value, onPick) {
-  el.innerHTML = t.events.map(e => `<button class="chip${e.id === value ? ' on' : ''}" data-v="${e.id}" aria-pressed="${e.id === value}">${esc(e.name)}</button>`).join('');
+function chips(el, value, onPick, events = t.events) {
+  el.innerHTML = events.map(e => `<button class="chip${e.id === value ? ' on' : ''}" data-v="${e.id}" aria-pressed="${e.id === value}">${esc(e.name)}</button>`).join('');
   el.onclick = ev => { const b = ev.target.closest('button'); if (b) onPick(b.dataset.v); };
 }
 
@@ -139,10 +139,23 @@ function groupHead(e, g, ms) {
   return names.length ? `<div class="ref">Trọng tài: ${names.map(esc).join(', ')}</div>` : '';
 }
 
+// Trọng tài chỉ thấy bảng mình bắt (điện thoại màn nhỏ, tránh nhập nhầm); BTC thấy tất cả
+const myGroup = (ev, g) => me?.admin
+  || view.matches.some(m => m.event === ev && m.stage === 'G' && m.group === g && data.assign[m.id] === me?.uid);
+
 function renderGroups() {
-  chips($('#groups-filter'), state.ev, v => { state.ev = v; save('pb-admin-ev', v); renderGroups(); });
+  const events = t.events.filter(e => Object.keys(e.groups).some(g => myGroup(e.id, g)));
+  if (!events.length) {
+    $('#groups-filter').innerHTML = '';
+    $('#groups-list').innerHTML = '<p class="empty">Bạn chưa được giao bảng nào. Trận loại trực tiếp được giao (nếu có) nằm ở tab Nhánh đấu.</p>';
+    $('#ties').hidden = true;
+    return;
+  }
+  if (!events.some(e => e.id === state.ev)) state.ev = events[0].id;
+  chips($('#groups-filter'), state.ev, v => { state.ev = v; save('pb-admin-ev', v); renderGroups(); }, events);
+  $('#groups-filter').hidden = events.length < 2 && !me?.admin;
   const e = EVENTS[state.ev];
-  $('#groups-list').innerHTML = Object.values(view.standings[e.id]).map(g => {
+  $('#groups-list').innerHTML = Object.values(view.standings[e.id]).filter(g => myGroup(e.id, g.group)).map(g => {
     const ms = view.matches.filter(m => m.event === e.id && m.stage === 'G' && m.group === g.group);
     const mine = !me?.admin && ms.some(m => data.assign[m.id] === me?.uid);
     const started = g.remaining < g.total;
