@@ -1,0 +1,152 @@
+{
+  "standings": {
+    "A": [
+      {
+        "code": "A1",
+        "pts": 6,
+        "pf": 29,
+        "diff": 7,
+        "rank": 1
+      },
+      {
+        "code": "A2",
+        "pts": 6,
+        "pf": 27,
+        "diff": 5,
+        "rank": 2
+      },
+      {
+        "code": "A3",
+        "pts": 6,
+        "pf": 30,
+        "diff": 3,
+        "rank": 3
+      },
+      {
+        "code": "A4",
+        "pts": 0,
+        "pf": 18,
+        "diff": -15,
+        "rank": 4
+      }
+    ],
+    "B": [
+      {
+        "code": "B1",
+        "pts": 6,
+        "pf": 31,
+        "diff": 14,
+        "rank": 1
+      },
+      {
+        "code": "B2",
+        "pts": 6,
+        "pf": 28,
+        "diff": -2,
+        "rank": 3
+      },
+      {
+        "code": "B3",
+        "pts": 6,
+        "pf": 26,
+        "diff": 2,
+        "rank": 2
+      },
+      {
+        "code": "B4",
+        "pts": 0,
+        "pf": 19,
+        "diff": -14,
+        "rank": 4
+      }
+    ],
+    "C": [
+      {
+        "code": "C1",
+        "pts": 3,
+        "pf": 16,
+        "diff": -3,
+        "rank": 3
+      },
+      {
+        "code": "C2",
+        "pts": 3,
+        "pf": 19,
+        "diff": -1,
+        "rank": 2
+      },
+      {
+        "code": "C3",
+        "pts": 3,
+        "pf": 20,
+        "diff": 4,
+        "rank": 1
+      }
+    ],
+    "D": [
+      {
+        "code": "D1",
+        "pts": 6,
+        "pf": 22,
+        "diff": 16,
+        "rank": 1
+      },
+      {
+        "code": "D2",
+        "pts": 0,
+        "pf": 5,
+        "diff": -17,
+        "rank": 3
+      },
+      {
+        "code": "D3",
+        "pts": 3,
+        "pf": 15,
+        "diff": 1,
+        "rank": 2
+      }
+    ]
+  },
+  "knockout": {
+    "MD-QF1": {
+      "team1": "Trần Công Hân - Lê Văn Ninh",
+      "team2": "Nguyễn Văn Hưng - Nguyễn Văn Ánh",
+      "winner": "Trần Công Hân - Lê Văn Ninh"
+    },
+    "MD-QF2": {
+      "team1": "Đỗ Trung Dũng - Dương Tuấn Linh",
+      "team2": "Đào Quang Hưng - Hoàng Gia Linh",
+      "winner": "Đào Quang Hưng - Hoàng Gia Linh"
+    },
+    "MD-QF3": {
+      "team1": "Nguyễn Trung Hiếu - Vũ Quang Hoàng Anh",
+      "team2": "Nguyễn Xuân Khải - Nguyễn Anh Tú",
+      "winner": "Nguyễn Trung Hiếu - Vũ Quang Hoàng Anh"
+    },
+    "MD-QF4": {
+      "team1": "Nguyễn Thanh Long - Nguyễn Thanh Bằng",
+      "team2": "Lê Hoàng Anh - Hoàng Bảo An",
+      "winner": "Nguyễn Thanh Long - Nguyễn Thanh Bằng"
+    },
+    "MD-SF1": {
+      "team1": "Trần Công Hân - Lê Văn Ninh",
+      "team2": "Đào Quang Hưng - Hoàng Gia Linh",
+      "winner": "Trần Công Hân - Lê Văn Ninh"
+    },
+    "MD-SF2": {
+      "team1": "Nguyễn Trung Hiếu - Vũ Quang Hoàng Anh",
+      "team2": "Nguyễn Thanh Long - Nguyễn Thanh Bằng",
+      "winner": "Nguyễn Thanh Long - Nguyễn Thanh Bằng"
+    },
+    "MD-F": {
+      "team1": "Trần Công Hân - Lê Văn Ninh",
+      "team2": "Nguyễn Thanh Long - Nguyễn Thanh Bằng",
+      "winner": "Trần Công Hân - Lê Văn Ninh"
+    }
+  },
+  "final": {
+    "champion": "Trần Công Hân - Lê Văn Ninh",
+    "runnerUp": "Nguyễn Thanh Long - Nguyễn Thanh Bằng",
+    "thirds": "Đào Quang Hưng - Hoàng Gia Linh  |  Nguyễn Trung Hiếu - Vũ Quang Hoàng Anh"
+  }
+}
