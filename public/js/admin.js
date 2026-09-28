@@ -5,12 +5,36 @@ import { esc, load, save, byRoundCourt } from './util.js';
 const $ = s => document.querySelector(s);
 const t = await fetch('data/tournament.json', { cache: 'no-cache' }).then(r => r.json());
 const EVENTS = Object.fromEntries(t.events.map(e => [e.id, e]));
-const store = await createStore();
+const fatal = msg => { $('#fatal').textContent = msg; $('#fatal').hidden = !msg; };
+const slow = setTimeout(() => fatal('Chưa tải được Firebase. Kiểm tra mạng hoặc chuyển sang 4G rồi tải lại trang.'), 10000);
+let store;
+try {
+  store = await createStore();
+} catch (err) {
+  fatal('Không tải được Firebase. Kiểm tra mạng hoặc chuyển sang 4G rồi tải lại trang.');
+  throw err;
+} finally {
+  clearTimeout(slow);
+}
+fatal('');
 
 let data = { scores: {}, overrides: {} };
 let view = buildView(t);
 const state = { ev: load('pb-admin-ev', 'ALL'), round: load('pb-admin-round', 'auto') };
 let armed = null; // id trận đang chờ bấm lần 2 để xóa tỷ số
+const drafts = new Map(); // "ev/g" → thứ tự đang sắp dở ở khu bằng điểm, giữ qua các lần vẽ lại
+let online = false, everConnected = false, pending = 0;
+
+// SDK web chỉ giữ thao tác chưa gửi trong bộ nhớ tab: mất mạng thì phải giữ trang mở
+function renderConn() {
+  const el = $('#conn');
+  const wait = pending ? `, ${pending} thao tác chờ gửi` : '';
+  el.className = `conn ${online || !everConnected ? 'on' : 'off'}`;
+  el.textContent = !everConnected ? 'Đang kết nối…'
+    : online ? (pending ? `Đang gửi ${pending} thao tác…` : 'Đã kết nối')
+      : `Mất kết nối${wait}. Đừng đóng hay tải lại trang`;
+}
+const track = p => { pending++; renderConn(); return p.finally(() => { pending--; renderConn(); }); };
 
 function toast(msg) {
   const el = $('#toast');
@@ -73,9 +97,11 @@ function renderTies() {
     const badge = g.overridden ? '<span class="pill">BTC đã chốt</span>'
       : g.needsTiebreak ? '<span class="pill live">Bằng mọi chỉ số, nhánh đấu đang chờ BTC chốt</span>'
         : '<span class="pill">Bằng điểm, kiểm lại theo Điều lệ III.3 nếu cần</span>';
+    const draft = drafts.get(`${e.id}/${g.group}`);
+    const rows = draft ? draft.map(c => g.rows.find(r => r.code === c)) : g.rows;
     return `<article class="tie" data-ev="${e.id}" data-g="${g.group}">
-      <h3>${esc(e.name)}, bảng ${g.group} ${badge}</h3>
-      <ol>${g.rows.map(r => `<li data-code="${r.code}"><span class="code">${r.code}</span>
+      <h3>${esc(e.name)}, bảng ${g.group} ${badge}${draft ? '<span class="pill live">Chưa lưu</span>' : ''}</h3>
+      <ol>${rows.map(r => `<li data-code="${r.code}"><span class="code">${r.code}</span>
         <span class="a-name">${esc(nameOf(t, e.id, r.code))}<small>${r.pts} điểm, hiệu số ${r.diff > 0 ? '+' : ''}${r.diff}, ghi ${r.pf}</small></span>
         <button data-act="up" aria-label="Đưa lên">↑</button><button data-act="down" aria-label="Đưa xuống">↓</button></li>`).join('')}</ol>
       <div class="a-actions"><button data-act="save" class="primary">Chốt thứ tự này</button>${g.overridden ? '<button data-act="reset" class="ghost">Bỏ chốt, tính tự động</button>' : ''}</div>
@@ -99,7 +125,7 @@ $('#list').addEventListener('click', e => {
   if (!b) return;
   const id = b.closest('[data-id]').dataset.id;
   const cur = data.scores[id] ?? { s1: 0, s2: 0, status: 'live' };
-  const put = v => store.setScore(id, v).catch(fail);
+  const put = v => track(store.setScore(id, v)).catch(fail);
   const act = b.dataset.act;
   if (act !== 'clear') armed = null;
   if (act === 'inc' || act === 'dec') {
@@ -118,12 +144,18 @@ $('#list').addEventListener('click', e => {
 $('#ties-list').addEventListener('click', e => {
   const b = e.target.closest('button[data-act]');
   if (!b) return;
-  const box = b.closest('.tie'), ol = box.querySelector('ol'), li = b.closest('li');
+  const box = b.closest('.tie'), { ev, g } = box.dataset, key = `${ev}/${g}`;
+  const order = [...box.querySelectorAll('li')].map(x => x.dataset.code);
   const act = b.dataset.act;
-  if (act === 'up' && li.previousElementSibling) ol.insertBefore(li, li.previousElementSibling);
-  if (act === 'down' && li.nextElementSibling) ol.insertBefore(li.nextElementSibling, li);
-  if (act === 'save') store.setOverride(box.dataset.ev, box.dataset.g, [...ol.children].map(x => x.dataset.code)).then(() => toast('Đã chốt thứ tự')).catch(fail);
-  if (act === 'reset') store.setOverride(box.dataset.ev, box.dataset.g, null).then(() => toast('Đã bỏ chốt')).catch(fail);
+  if (act === 'up' || act === 'down') {
+    const i = order.indexOf(b.closest('li').dataset.code), j = act === 'up' ? i - 1 : i + 1;
+    if (j < 0 || j >= order.length) return;
+    [order[i], order[j]] = [order[j], order[i]];
+    drafts.set(key, order);
+    renderTies();
+  }
+  if (act === 'save') track(store.setOverride(ev, g, order)).then(() => { drafts.delete(key); renderTies(); toast('Đã chốt thứ tự'); }).catch(fail);
+  if (act === 'reset') { drafts.delete(key); track(store.setOverride(ev, g, null)).then(() => toast('Đã bỏ chốt')).catch(fail); }
 });
 
 $('#login-form').addEventListener('submit', async e => {
@@ -143,8 +175,9 @@ store.onAuth(user => {
   $('#who').textContent = user?.email ?? '';
 });
 store.onConnection(on => {
-  const el = $('#conn');
-  el.textContent = on ? 'Đã kết nối' : 'Mất kết nối, tỷ số sẽ gửi khi có mạng';
-  el.className = `conn ${on ? 'on' : 'off'}`;
+  // .info/connected luôn báo false trước: chỉ báo mất kết nối sau khi đã từng kết nối
+  if (on) everConnected = true;
+  online = on;
+  renderConn();
 });
 store.onData(d => { data = d; view = buildView(t, d.scores, d.overrides); render(); });

@@ -140,13 +140,24 @@ const setConn = on => {
   document.body.dataset.conn = on ? 'on' : 'off';
   $('#conn-text').textContent = on ? 'Tỷ số cập nhật trực tiếp' : 'Mất kết nối, đang thử lại…';
 };
+const unavailable = () => {
+  document.body.dataset.conn = 'off';
+  $('#conn-text').textContent = 'Chưa tải được tỷ số trực tiếp. Lịch đấu vẫn xem được';
+};
+// Mạng chặn hoặc treo không báo lỗi: sau 10 giây chưa kết nối thì nói rõ, không để "Đang kết nối…" mãi
+let everConnected = false;
+const slow = setTimeout(() => { if (!everConnected) unavailable(); }, 10000);
 try {
   const store = await createStore();
   $('#demo-badge').hidden = !isDemo();
-  store.onConnection(setConn);
+  // .info/connected luôn báo false trước: chỉ báo mất kết nối sau khi đã từng kết nối
+  store.onConnection(on => {
+    if (on) { everConnected = true; clearTimeout(slow); }
+    if (everConnected) setConn(on);
+  });
   store.onData(d => { view = buildView(t, d.scores, d.overrides); render(); });
 } catch (err) {
   console.error(err);
-  setConn(false);
-  $('#conn-text').textContent = 'Chưa tải được tỷ số trực tiếp. Lịch đấu vẫn xem được';
+  clearTimeout(slow);
+  unavailable();
 }

@@ -47,7 +47,9 @@ export function computeGroup(t, eventId, group, scores, override) {
 
   const overridden = Array.isArray(override) && override.length === codes.length
     && codes.every(c => override.includes(c));
-  if (overridden) sorted = override.map(c => byCode[c]);
+  // Thứ tự BTC chốt chỉ phân định các đội bằng điểm (Điều lệ III.3), không vượt qua điểm:
+  // nếu sau đó sửa tỷ số làm điểm thay đổi thì điểm vẫn quyết định trước.
+  if (overridden) sorted = [...rows].sort((x, y) => y.pts - x.pts || override.indexOf(x.code) - override.indexOf(y.code));
   sorted.forEach((r, i) => { r.rank = i + 1; });
 
   return {

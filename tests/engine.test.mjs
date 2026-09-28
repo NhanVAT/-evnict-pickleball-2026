@@ -97,3 +97,15 @@ test('Đôi Nữ: nhất A gặp nhì B ở bán kết 1', () => {
   assert.deepEqual([v.byId['WD-SF1'].team1, v.byId['WD-SF1'].team2], ['A1', 'B2']);
   assert.deepEqual([v.byId['WD-SF2'].team1, v.byId['WD-SF2'].team2], ['B1', 'A2']);
 });
+
+test('thứ tự BTC chốt chỉ phân định trong nhóm bằng điểm, không đè lên điểm', () => {
+  // A1 thắng cả 3 trận (9 điểm); thứ tự chốt cũ đặt A1 cuối bảng
+  const ids = groupIds('WD', 'A'); // A1-A2, A3-A4, A1-A3, A2-A4, A1-A4, A2-A3
+  const sc = [[11, 5], [11, 9], [11, 7], [3, 11], [11, 6], [11, 5]]; // A2>A3>A4>A2, mỗi đội 3 điểm
+  const scores = Object.fromEntries(ids.map((id, i) => [id, done(...sc[i])]));
+  const g = computeGroup(t, 'WD', 'A', scores, ['A4', 'A3', 'A2', 'A1']);
+  assert.equal(g.rows[0].code, 'A1');
+  // A2, A3, A4 cùng 3 điểm: thứ tự chốt (A4, A3, A2) được dùng để phân định
+  assert.deepEqual(g.rows.map(r => r.code), ['A1', 'A4', 'A3', 'A2']);
+  assert.equal(g.overridden, true);
+});
