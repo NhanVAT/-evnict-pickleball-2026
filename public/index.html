@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2c6a50">
+<meta name="description" content="Lịch thi đấu, bảng xếp hạng và tỷ số trực tiếp Giải Pickleball EVNICT 2026">
+<title>Pickleball EVNICT 2026</title>
+<link rel="icon" href="img/ball.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="hero">
+  <div class="court" aria-hidden="true"><img class="ball" src="img/ball.svg" alt=""></div>
+  <div class="hero-inner">
+    <p class="kicker">Giải thể thao thường niên</p>
+    <h1>Pickleball<br>EVNICT 2026</h1>
+    <p class="meta" id="hero-meta"></p>
+    <p class="status"><i></i><span id="conn-text">Đang kết nối…</span><span class="demo-badge" id="demo-badge" hidden>Chế độ thử</span></p>
+  </div>
+</header>
+<nav class="tabs" aria-label="Mục">
+  <a href="#home">Tổng quan</a>
+  <a href="#schedule">Lịch đấu</a>
+  <a href="#standings">Xếp hạng</a>
+  <a href="#bracket">Nhánh đấu</a>
+</nav>
+<main>
+  <section class="view" id="view-home"></section>
+  <section class="view" id="view-schedule" hidden>
+    <div class="controls"><input id="search" type="search" placeholder="Gõ tên bạn để xem trận của mình (không dấu cũng được)" autocomplete="off" aria-label="Tìm theo tên vận động viên"></div>
+    <div class="chips" id="schedule-filter"></div>
+    <div id="schedule-list"></div>
+  </section>
+  <section class="view" id="view-standings" hidden>
+    <div class="chips" id="standings-filter"></div>
+    <div id="standings-list"></div>
+  </section>
+  <section class="view" id="view-bracket" hidden>
+    <div class="chips" id="bracket-filter"></div>
+    <div id="bracket-list"></div>
+  </section>
+</main>
+<footer>Ban tổ chức Giải Pickleball EVNICT 2026</footer>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
