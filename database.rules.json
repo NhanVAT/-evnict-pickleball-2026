@@ -1,0 +1,14 @@
+{
+  "rules": {
+    ".read": true,
+    "scores": {
+      "$match": {
+        ".write": "auth != null && auth.uid === '__ADMIN_UID__'",
+        ".validate": "newData.hasChildren(['s1', 's2', 'status']) && newData.child('s1').isNumber() && newData.child('s1').val() >= 0 && newData.child('s1').val() <= 99 && newData.child('s2').isNumber() && newData.child('s2').val() >= 0 && newData.child('s2').val() <= 99 && (newData.child('status').val() === 'live' || newData.child('status').val() === 'done')"
+      }
+    },
+    "overrides": {
+      ".write": "auth != null && auth.uid === '__ADMIN_UID__'"
+    }
+  }
+}
