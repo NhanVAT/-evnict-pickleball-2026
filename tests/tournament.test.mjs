@@ -59,3 +59,31 @@ test('6 sân có tên thật theo phiếu đặt sân', () => {
   assert.deepEqual(t.courtNames, { 1: 'Sân thi đấu', 2: 'Sân 4', 3: 'Sân 5', 4: 'Sân 6', 5: 'Sân 7', 6: 'Sân 8' });
   for (const m of t.matches) assert.ok(t.courtNames[m.court], m.id);
 });
+
+// Lịch cân đối 30/09: Nam-Nữ trùng người với cả Đôi Nam lẫn Đôi Nữ nên không bao giờ chung lượt
+test('lượt có Nam-Nữ thì không có Đôi Nam hay Đôi Nữ', () => {
+  const byRound = new Map();
+  for (const m of t.matches) byRound.set(m.round, (byRound.get(m.round) ?? new Set()).add(m.event));
+  for (const [r, evs] of byRound) assert.ok(!evs.has('XD') || evs.size === 1, `lượt ${r}: ${[...evs]}`);
+});
+
+test('trận loại trực tiếp đánh sau các trận nó phụ thuộc', () => {
+  const byId = Object.fromEntries(t.matches.map(m => [m.id, m]));
+  for (const m of t.matches.filter(x => x.stage !== 'G')) {
+    for (const s of [m.src1, m.src2]) {
+      const deps = s.winner ? [byId[s.winner]] : t.matches.filter(x => x.event === m.event && x.stage === 'G' && x.group === s.group);
+      for (const d of deps) assert.ok(d.round < m.round, `${m.id} (lượt ${m.round}) phải sau ${d.id} (lượt ${d.round})`);
+    }
+  }
+});
+
+test('lịch loại trực tiếp mới: 3 chung kết ở Sân thi đấu, CK Nam rồi CK Nam-Nữ là 2 lượt cuối', () => {
+  const at = id => { const m = t.matches.find(x => x.id === id); return [m.round, m.court]; };
+  assert.deepEqual(['MD-QF1', 'MD-QF4', 'WD-SF1', 'WD-SF2'].map(at), [[7, 1], [7, 4], [7, 5], [7, 6]]);
+  assert.deepEqual(['XD-QF1', 'XD-QF4'].map(at), [[11, 1], [11, 4]]);
+  assert.deepEqual(['WD-F', 'MD-SF1', 'MD-SF2'].map(at), [[12, 1], [12, 2], [12, 3]]);
+  assert.deepEqual(['XD-SF1', 'XD-SF2'].map(at), [[13, 2], [13, 3]]);
+  assert.deepEqual(['MD-F', 'XD-F'].map(at), [[14, 1], [15, 1]]);
+  assert.deepEqual([...new Set(t.matches.filter(m => m.event === 'XD' && m.stage === 'G').map(m => m.round))].sort((a, b) => a - b), [8, 9, 10]);
+  assert.equal(Object.keys(t.rounds).length, 15);
+});

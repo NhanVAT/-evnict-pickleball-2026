@@ -6,7 +6,7 @@
  "venue": "Hà Nội",
  "hours": "7h00 – 12h00",
  "courts": 6,
- "endTime": "11:57",
+ "endTime": "12:12",
  "rounds": {
   "1": "07:00",
   "2": "07:18",
@@ -14,14 +14,15 @@
   "4": "07:54",
   "5": "08:12",
   "6": "08:30",
-  "7": "08:53",
-  "8": "09:11",
-  "9": "09:29",
-  "10": "09:52",
-  "11": "10:17",
-  "12": "10:42",
-  "13": "11:07",
-  "14": "11:32"
+  "7": "08:48",
+  "8": "09:13",
+  "9": "09:31",
+  "10": "09:49",
+  "11": "10:07",
+  "12": "10:32",
+  "13": "10:57",
+  "14": "11:22",
+  "15": "11:47"
  },
  "courtNames": {
   "1": "Sân thi đấu",
@@ -456,7 +457,7 @@
    "event": "MD",
    "stage": "QF",
    "label": "Tứ kết 1",
-   "round": 10,
+   "round": 7,
    "court": 1,
    "src1": {
     "group": "A",
@@ -472,7 +473,7 @@
    "event": "MD",
    "stage": "QF",
    "label": "Tứ kết 2",
-   "round": 10,
+   "round": 7,
    "court": 2,
    "src1": {
     "group": "C",
@@ -488,7 +489,7 @@
    "event": "MD",
    "stage": "QF",
    "label": "Tứ kết 3",
-   "round": 10,
+   "round": 7,
    "court": 3,
    "src1": {
     "group": "B",
@@ -504,7 +505,7 @@
    "event": "MD",
    "stage": "QF",
    "label": "Tứ kết 4",
-   "round": 10,
+   "round": 7,
    "court": 4,
    "src1": {
     "group": "D",
@@ -520,8 +521,8 @@
    "event": "MD",
    "stage": "SF",
    "label": "Bán kết 1",
-   "round": 11,
-   "court": 1,
+   "round": 12,
+   "court": 2,
    "src1": {
     "winner": "MD-QF1"
    },
@@ -534,8 +535,8 @@
    "event": "MD",
    "stage": "SF",
    "label": "Bán kết 2",
-   "round": 11,
-   "court": 2,
+   "round": 12,
+   "court": 3,
    "src1": {
     "winner": "MD-QF3"
    },
@@ -548,8 +549,8 @@
    "event": "MD",
    "stage": "F",
    "label": "Chung kết",
-   "round": 13,
-   "court": 3,
+   "round": 14,
+   "court": 1,
    "src1": {
     "winner": "MD-SF1"
    },
@@ -563,7 +564,7 @@
    "stage": "G",
    "label": "Bảng A",
    "group": "A",
-   "round": 7,
+   "round": 8,
    "court": 1,
    "t1": "A1",
    "t2": "A2"
@@ -574,7 +575,7 @@
    "stage": "G",
    "label": "Bảng A",
    "group": "A",
-   "round": 7,
+   "round": 8,
    "court": 2,
    "t1": "A3",
    "t2": "A4"
@@ -585,7 +586,7 @@
    "stage": "G",
    "label": "Bảng A",
    "group": "A",
-   "round": 8,
+   "round": 9,
    "court": 1,
    "t1": "A1",
    "t2": "A3"
@@ -596,7 +597,7 @@
    "stage": "G",
    "label": "Bảng A",
    "group": "A",
-   "round": 8,
+   "round": 9,
    "court": 2,
    "t1": "A2",
    "t2": "A4"
@@ -607,7 +608,7 @@
    "stage": "G",
    "label": "Bảng A",
    "group": "A",
-   "round": 9,
+   "round": 10,
    "court": 1,
    "t1": "A1",
    "t2": "A4"
@@ -618,7 +619,7 @@
    "stage": "G",
    "label": "Bảng A",
    "group": "A",
-   "round": 9,
+   "round": 10,
    "court": 2,
    "t1": "A2",
    "t2": "A3"
@@ -629,7 +630,7 @@
    "stage": "G",
    "label": "Bảng B",
    "group": "B",
-   "round": 7,
+   "round": 8,
    "court": 3,
    "t1": "B1",
    "t2": "B2"
@@ -640,7 +641,7 @@
    "stage": "G",
    "label": "Bảng B",
    "group": "B",
-   "round": 7,
+   "round": 8,
    "court": 4,
    "t1": "B3",
    "t2": "B4"
@@ -651,7 +652,7 @@
    "stage": "G",
    "label": "Bảng B",
    "group": "B",
-   "round": 8,
+   "round": 9,
    "court": 3,
    "t1": "B1",
    "t2": "B3"
@@ -662,7 +663,7 @@
    "stage": "G",
    "label": "Bảng B",
    "group": "B",
-   "round": 8,
+   "round": 9,
    "court": 4,
    "t1": "B2",
    "t2": "B4"
@@ -673,7 +674,7 @@
    "stage": "G",
    "label": "Bảng B",
    "group": "B",
-   "round": 9,
+   "round": 10,
    "court": 3,
    "t1": "B1",
    "t2": "B4"
@@ -684,7 +685,7 @@
    "stage": "G",
    "label": "Bảng B",
    "group": "B",
-   "round": 9,
+   "round": 10,
    "court": 4,
    "t1": "B2",
    "t2": "B3"
@@ -695,7 +696,7 @@
    "stage": "G",
    "label": "Bảng C",
    "group": "C",
-   "round": 7,
+   "round": 8,
    "court": 5,
    "t1": "C1",
    "t2": "C2"
@@ -706,7 +707,7 @@
    "stage": "G",
    "label": "Bảng C",
    "group": "C",
-   "round": 8,
+   "round": 9,
    "court": 5,
    "t1": "C1",
    "t2": "C3"
@@ -717,7 +718,7 @@
    "stage": "G",
    "label": "Bảng C",
    "group": "C",
-   "round": 9,
+   "round": 10,
    "court": 5,
    "t1": "C2",
    "t2": "C3"
@@ -728,7 +729,7 @@
    "stage": "G",
    "label": "Bảng D",
    "group": "D",
-   "round": 7,
+   "round": 8,
    "court": 6,
    "t1": "D1",
    "t2": "D2"
@@ -739,7 +740,7 @@
    "stage": "G",
    "label": "Bảng D",
    "group": "D",
-   "round": 8,
+   "round": 9,
    "court": 6,
    "t1": "D1",
    "t2": "D3"
@@ -750,7 +751,7 @@
    "stage": "G",
    "label": "Bảng D",
    "group": "D",
-   "round": 9,
+   "round": 10,
    "court": 6,
    "t1": "D2",
    "t2": "D3"
@@ -760,7 +761,7 @@
    "event": "XD",
    "stage": "QF",
    "label": "Tứ kết 1",
-   "round": 12,
+   "round": 11,
    "court": 1,
    "src1": {
     "group": "A",
@@ -776,7 +777,7 @@
    "event": "XD",
    "stage": "QF",
    "label": "Tứ kết 2",
-   "round": 12,
+   "round": 11,
    "court": 2,
    "src1": {
     "group": "C",
@@ -792,7 +793,7 @@
    "event": "XD",
    "stage": "QF",
    "label": "Tứ kết 3",
-   "round": 12,
+   "round": 11,
    "court": 3,
    "src1": {
     "group": "B",
@@ -808,7 +809,7 @@
    "event": "XD",
    "stage": "QF",
    "label": "Tứ kết 4",
-   "round": 12,
+   "round": 11,
    "court": 4,
    "src1": {
     "group": "D",
@@ -825,7 +826,7 @@
    "stage": "SF",
    "label": "Bán kết 1",
    "round": 13,
-   "court": 1,
+   "court": 2,
    "src1": {
     "winner": "XD-QF1"
    },
@@ -839,7 +840,7 @@
    "stage": "SF",
    "label": "Bán kết 2",
    "round": 13,
-   "court": 2,
+   "court": 3,
    "src1": {
     "winner": "XD-QF3"
    },
@@ -852,7 +853,7 @@
    "event": "XD",
    "stage": "F",
    "label": "Chung kết",
-   "round": 14,
+   "round": 15,
    "court": 1,
    "src1": {
     "winner": "XD-SF1"
@@ -965,7 +966,7 @@
    "event": "WD",
    "stage": "SF",
    "label": "Bán kết 1",
-   "round": 10,
+   "round": 7,
    "court": 5,
    "src1": {
     "group": "A",
@@ -981,7 +982,7 @@
    "event": "WD",
    "stage": "SF",
    "label": "Bán kết 2",
-   "round": 10,
+   "round": 7,
    "court": 6,
    "src1": {
     "group": "B",
@@ -997,8 +998,8 @@
    "event": "WD",
    "stage": "F",
    "label": "Chung kết",
-   "round": 11,
-   "court": 3,
+   "round": 12,
+   "court": 1,
    "src1": {
     "winner": "WD-SF1"
    },

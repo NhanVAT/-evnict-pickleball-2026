@@ -205,3 +205,39 @@ tr.me td { background: color-mix(in srgb, var(--ball) 45%, transparent); font-we
 .lock-note { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
 .ff { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; }
 .ff p { width: 100%; margin: 0; font-weight: 600; }
+
+/* ---------- Trận đang đấu nổi bật; tứ kết / bán kết / chung kết có viền riêng */
+.stage-tag { font-weight: 700; padding: 0 7px; border-radius: 4px; }
+.st-QF { background: color-mix(in srgb, var(--court) 14%, transparent); color: var(--court); }
+.st-SF { background: var(--court); color: #fff; }
+.st-F { background: linear-gradient(90deg, #d9a521, var(--ball)); color: #3a2a00; }
+@media (prefers-color-scheme: dark) { .st-QF { color: #9cc3ea; } }
+.match.stage-QF, .a-match.stage-QF { border-top: 3px solid var(--court); }
+.match.stage-SF, .a-match.stage-SF { border: 2px solid var(--court); border-top-width: 4px; }
+.match.stage-F, .a-match.stage-F {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--surface), var(--surface)) padding-box, linear-gradient(135deg, #d9a521, var(--ball), #d9a521) border-box;
+  box-shadow: 0 4px 18px color-mix(in srgb, #d9a521 30%, transparent);
+}
+.match.live, .a-match.live { border-color: var(--live); animation: live-glow 1.8s ease-in-out infinite; }
+.match.live.stage-F, .a-match.live.stage-F { border-color: transparent; }
+@keyframes live-glow { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 45%, transparent); } 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--live) 0%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .match.live, .a-match.live { animation: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--live) 35%, transparent); } }
+
+/* Bảng sân ở Tổng quan */
+.court-board { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
+.court-tile header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+.court-tile h3 { margin: 0; font-family: var(--display); font-size: 24px; }
+.tile-state { font-size: 13px; font-weight: 600; color: var(--muted); }
+.court-tile.live .tile-state { color: var(--live); }
+.court-tile.idle { opacity: .6; }
+.court-tile .empty { margin: 0; }
+
+/* Admin: tab Theo lượt, Của tôi */
+.when { font-size: 12px; color: var(--muted); margin: -4px 0 6px; }
+.round-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0 0; }
+.round-block.past { opacity: .7; }
+.round-block.now > .sec { color: var(--live); }
+.round-block .sec .sp { flex: 1; }
+.count-plain { font-family: "Be Vietnam Pro", sans-serif; font-size: 14px; color: var(--muted); font-weight: 600; }
+.round-block { scroll-margin-top: 56px; }

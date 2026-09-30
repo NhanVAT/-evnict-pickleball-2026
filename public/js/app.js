@@ -31,9 +31,12 @@ function side(m, n) {
   return `<div class="side${m.winner === n ? ' win' : ''}"><span class="code">${code ?? ''}</span><span class="name">${name}</span><span class="pts">${pts}</span></div>`;
 }
 
+// Tứ kết, bán kết, chung kết có nhãn và viền riêng để thấy mức độ quan trọng
+const stageLabel = m => (m.stage === 'G' ? `<span>${esc(m.label)}</span>` : `<span class="stage-tag st-${m.stage}">${esc(m.label)}</span>`);
+
 function matchCard(m, mine = false) {
-  return `<article class="match ${m.status}${mine ? ' mine' : ''}">
-    <div class="match-meta"><span class="court-no">${esc(courtName(t, m.court))}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${statusPill(m)}</div>
+  return `<article class="match ${m.status} stage-${m.stage}${mine ? ' mine' : ''}">
+    <div class="match-meta"><span class="court-no">${esc(courtName(t, m.court))}</span><span class="ev">${esc(EVENTS[m.event].name)}</span>${stageLabel(m)}<span class="sp"></span>${statusPill(m)}</div>
     ${REF_NAME[assign[m.id]] ? `<div class="ref">Trọng tài: ${esc(REF_NAME[assign[m.id]])}</div>` : ''}
     ${side(m, 1)}${side(m, 2)}
     ${m.score?.forfeit && m[`team${m.score.forfeit.loser}`] ? `<p class="lock-note">${m[`team${m.score.forfeit.loser}`]} bị xử thua: ${m.score.forfeit.reason === 'retired' ? 'bỏ cuộc giữa chừng' : 'vắng mặt / đến muộn'}</p>` : ''}
@@ -58,15 +61,33 @@ function chips(el, value, withAll, onPick) {
 }
 
 // ---------- Các tab
+// Bảng sân: mỗi sân hiện trận đang đấu, nếu không thì trận kế tiếp của sân đó
+function courtTile(c) {
+  const on = view.matches.filter(m => m.court === c).sort(byRoundCourt);
+  const live = on.find(m => m.status === 'live');
+  const next = on.find(m => m.status === 'pending');
+  const m = live ?? next;
+  const state = live ? 'live' : next ? 'next' : 'idle';
+  const label = live ? 'Đang đấu' : next ? 'Trận tiếp theo' : 'Đã hết trận';
+  return `<section class="court-tile ${state}">
+    <header><h3>${esc(courtName(t, c))}</h3><span class="tile-state">${label}</span></header>
+    ${m ? matchCard(m) : '<p class="empty">Sân này đã đánh xong.</p>'}
+  </section>`;
+}
+
 function renderHome() {
-  const live = view.matches.filter(m => m.status === 'live').sort(byRoundCourt);
+  const live = view.matches.filter(m => m.status === 'live');
   const doneCount = view.matches.filter(m => m.status === 'done').length;
+  const latest = view.matches.filter(m => m.status === 'done')
+    .sort((a, b) => (b.score.updatedAt ?? 0) - (a.score.updatedAt ?? 0)).slice(0, 4);
   const podiums = t.events.map(podiumCard).join('');
+  const courts = Object.keys(t.courtNames).map(Number);
   $('#view-home').innerHTML = `
     <div class="progress"><div class="bar"><i style="width:${(doneCount / t.matches.length) * 100}%"></i></div><span>${doneCount}/${t.matches.length} trận đã xong</span></div>
     ${podiums ? `<h2 class="sec">Kết quả chung cuộc</h2><div class="grid">${podiums}</div>` : ''}
-    <h2 class="sec">Đang diễn ra ${live.length ? `<span class="count">${live.length}</span>` : ''}</h2>
-    ${live.length ? `<div class="grid">${live.map(m => matchCard(m)).join('')}</div>` : '<p class="empty">Chưa có trận nào đang đấu.</p>'}
+    <h2 class="sec">Trên các sân ${live.length ? `<span class="count">${live.length} đang đấu</span>` : ''}</h2>
+    <div class="court-board">${courts.map(courtTile).join('')}</div>
+    ${latest.length ? `<h2 class="sec">Kết quả mới nhất</h2><div class="grid">${latest.map(m => matchCard(m)).join('')}</div>` : ''}
     <h2 class="sec">Thông tin giải</h2>
     <dl class="info">
       <div><dt>Ngày thi đấu</dt><dd>${esc(t.dateText)}</dd></div>

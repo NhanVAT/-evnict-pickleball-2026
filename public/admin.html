@@ -41,9 +41,18 @@
     <p class="empty" id="no-role" hidden>Tài khoản này chưa được cấp quyền nhập tỷ số. Báo Ban tổ chức nhé.</p>
     <p class="mine-note" id="mine-note" hidden></p>
     <nav class="tabs a-tabs" aria-label="Mục">
+      <a href="#rounds" data-role="admin">Theo lượt</a>
+      <a href="#mine" data-role="ref">Của tôi</a>
       <a href="#groups">Bảng đấu</a>
       <a href="#bracket">Nhánh đấu</a>
     </nav>
+    <section class="view" id="view-rounds" hidden>
+      <div class="round-bar"><span id="rounds-summary" class="muted small"></span><button class="btn" id="goto-current">Tới lượt hiện tại</button></div>
+      <div id="rounds-list"></div>
+    </section>
+    <section class="view" id="view-mine" hidden>
+      <div id="mine-list"></div>
+    </section>
     <section class="view" id="view-groups">
       <div class="chips" id="groups-filter"></div>
       <section id="ties" hidden>

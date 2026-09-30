@@ -1,14 +1,14 @@
 import { buildView, nameOf, forfeitScore } from './engine.js';
 import { createStore } from './store.js';
 import { ADMIN_UID } from './firebase-config.js';
-import { esc, load, save, courtName } from './util.js';
+import { esc, load, save, courtName, byRoundCourt } from './util.js';
 
 const $ = s => document.querySelector(s);
 const [t, referees] = await Promise.all(['data/tournament.json', 'data/referees.json']
   .map(u => fetch(u, { cache: 'no-cache' }).then(r => r.json())));
 const REF_NAME = Object.fromEntries(referees.map(r => [r.uid, r.name]));
 const EVENTS = Object.fromEntries(t.events.map(e => [e.id, e]));
-const TABS = ['groups', 'bracket'];
+const TABS = { admin: ['rounds', 'groups', 'bracket'], ref: ['mine', 'groups', 'bracket'] };
 const STAGE_TITLE = { QF: 'Tứ kết', SF: 'Bán kết', F: 'Chung kết' };
 const fatal = msg => { $('#fatal').textContent = msg; $('#fatal').hidden = !msg; };
 const slow = setTimeout(() => fatal('Chưa tải được Firebase. Kiểm tra mạng hoặc chuyển sang 4G rồi tải lại trang.'), 10000);
@@ -75,16 +75,19 @@ function chips(el, value, onPick, events = t.events) {
 
 // ---------- Thẻ trận: nhập được (trận của mình / BTC) hoặc chỉ xem
 function refLine(m) {
-  if (m.stage === 'G') return ''; // vòng bảng: trọng tài ghi ở đầu bảng
   if (me?.admin) {
     return `<label class="a-assign">Trọng tài <select data-act="assign">${refList(data.assign[m.id], '<option value="">Chưa giao</option>')}</select></label>`;
   }
+  if (m.stage === 'G') return ''; // vòng bảng: trọng tài ghi ở đầu bảng
   const n = REF_NAME[data.assign[m.id]];
   return n ? `<div class="ref">Trọng tài: ${esc(n)}</div>` : '';
 }
 
+const stageLabel = m => (m.stage === 'G' ? `<span>${esc(m.label)}</span>` : `<span class="stage-tag st-${m.stage}">${esc(m.label)}</span>`);
+
 function meta(m, pill) {
-  return `<div class="match-meta"><span class="court-no">${esc(courtName(t, m.court))}</span><span class="ev">${esc(EVENTS[m.event].name)}</span><span>${esc(m.label)}</span><span class="sp"></span>${pill}</div>`;
+  return `<div class="match-meta"><span class="court-no">${esc(courtName(t, m.court))}</span><span class="ev">${esc(EVENTS[m.event].name)}</span>${stageLabel(m)}<span class="sp"></span>${pill}</div>
+    <div class="when">Lượt ${m.round}, dự kiến ${t.rounds[m.round]}</div>`;
 }
 
 const REASON = { absent: 'vắng mặt / đến muộn', retired: 'bỏ cuộc giữa chừng' };
@@ -132,7 +135,7 @@ function editCard(m) {
   else if (confirmed) actions = admin ? '<button data-act="unconfirm">Bỏ xác nhận để sửa</button>' : '<p class="lock-note">BTC đã xác nhận kết quả. Cần sửa thì báo Ban tổ chức.</p>';
   else actions = `${admin ? '<button data-act="confirm" class="primary">Xác nhận kết quả</button>' : ''}<button data-act="reopen">Sửa lại</button>${clear}`;
   const pill = statusPill(m);
-  return `<article class="a-match ${m.status}" data-id="${m.id}">
+  return `<article class="a-match ${m.status} stage-${m.stage}" data-id="${m.id}">
     ${meta(m, pill)}
     ${side(1)}${side(2)}
     ${forfeitLine(m)}
@@ -148,7 +151,7 @@ function viewCard(m) {
     const pts = m.status === 'pending' ? '–' : m.score[`s${n}`];
     return `<div class="side${m.winner === n ? ' win' : ''}"><span class="code">${code ?? ''}</span><span class="name">${name}</span><span class="pts">${pts}</span></div>`;
   };
-  return `<article class="match ${m.status}" data-id="${m.id}">${meta(m, statusPill(m))}${refLine(m)}${side(1)}${side(2)}${forfeitLine(m)}</article>`;
+  return `<article class="match ${m.status} stage-${m.stage}" data-id="${m.id}">${meta(m, statusPill(m))}${refLine(m)}${side(1)}${side(2)}${forfeitLine(m)}</article>`;
 }
 
 const card = m => (canEdit(m) ? editCard(m) : viewCard(m));
@@ -235,6 +238,44 @@ function renderTies() {
   }).join('');
 }
 
+// ---------- Tab Theo lượt (BTC): lượt hiện tại = lượt nhỏ nhất còn trận chưa xong
+const currentRound = () => {
+  const open = view.matches.filter(m => m.status !== 'done').map(m => m.round);
+  return open.length ? Math.min(...open) : null;
+};
+
+function renderRounds() {
+  const cur = currentRound();
+  const rounds = Object.keys(t.rounds).map(Number);
+  const done = view.matches.filter(m => m.status === 'done').length;
+  $('#rounds-summary').textContent = cur ? `Đang ở lượt ${cur}. ${done}/${t.matches.length} trận đã xong.` : 'Tất cả các trận đã xong.';
+  $('#rounds-list').innerHTML = rounds.map(r => {
+    const ms = view.matches.filter(m => m.round === r).sort(byRoundCourt);
+    const fin = ms.filter(m => m.status === 'done').length, live = ms.filter(m => m.status === 'live').length;
+    const state = fin === ms.length ? 'past' : r === cur ? 'now' : 'next';
+    const tag = state === 'past' ? '<span class="pill ok">Xong</span>' : state === 'now' ? '<span class="pill live">Lượt hiện tại</span>' : '';
+    return `<section class="round-block ${state}" id="round-${r}">
+      <h2 class="sec">Lượt ${r} <span class="time">${t.rounds[r]}</span> ${tag}<span class="sp"></span><span class="muted small">${fin}/${ms.length} xong${live ? `, ${live} đang đấu` : ''}</span></h2>
+      <div class="grid">${ms.map(card).join('')}</div>
+    </section>`;
+  }).join('');
+}
+
+// ---------- Tab Của tôi (trọng tài): đang bắt, sắp tới, đã xong
+function renderMine() {
+  const mine = view.matches.filter(m => data.assign[m.id] === me?.uid).sort(byRoundCourt);
+  const part = (title, ms, empty) => `<h2 class="sec">${title} <span class="count-plain">${ms.length}</span></h2>
+    ${ms.length ? `<div class="grid">${ms.map(card).join('')}</div>` : `<p class="empty">${empty}</p>`}`;
+  const live = mine.filter(m => m.status === 'live');
+  const next = mine.filter(m => m.status === 'pending');
+  const done = mine.filter(m => m.status === 'done');
+  $('#mine-list').innerHTML = !mine.length
+    ? '<p class="empty">Chưa có trận nào được giao cho bạn. Báo Ban tổ chức nhé.</p>'
+    : part('Đang bắt', live, next.length ? `Chưa bắt trận nào. Trận tiếp theo của bạn: lượt ${next[0].round}, ${esc(courtName(t, next[0].court))}.` : 'Không có trận nào đang bắt.')
+      + part('Sắp tới', next, 'Bạn đã bắt hết các trận được giao.')
+      + part('Đã xong', done, 'Chưa có trận nào xong.');
+}
+
 function render() {
   const known = Boolean(me?.admin || me?.name);
   $('#no-role').hidden = !me || known;
@@ -245,13 +286,17 @@ function render() {
   $('#mine-note').textContent = mineCount
     ? `Bạn được giao ${mineCount} trận, có nút nhập điểm. Các trận khác chỉ xem.`
     : 'Chưa có trận nào được giao cho bạn. Báo Ban tổ chức nhé.';
+  document.querySelectorAll('[data-role]').forEach(a => { a.hidden = a.dataset.role !== (me.admin ? 'admin' : 'ref'); });
+  if (me.admin) renderRounds(); else renderMine();
   renderGroups();
   renderBracket();
+  showTab();
 }
 
 function showTab() {
   const h = location.hash.slice(1);
-  const tab = TABS.includes(h) ? h : 'groups';
+  const tabs = TABS[me?.admin ? 'admin' : 'ref'];
+  const tab = tabs.includes(h) ? h : tabs[0];
   document.querySelectorAll('.view').forEach(v => { v.hidden = v.id !== `view-${tab}`; });
   document.querySelectorAll('.a-tabs a').forEach(a => {
     const on = a.getAttribute('href') === `#${tab}`;
@@ -340,6 +385,11 @@ function focusMine() {
   state.ev = m.event; state.bk = m.event;
   focused = true;
 }
+
+$('#goto-current').onclick = () => {
+  const r = currentRound();
+  if (r) document.getElementById(`round-${r}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
 
 $('#demo-note').hidden = !store.demo;
 addEventListener('hashchange', showTab);
