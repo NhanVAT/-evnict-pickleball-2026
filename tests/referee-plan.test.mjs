@@ -23,15 +23,27 @@ test('không trọng tài nào bắt 2 trận cùng lượt', () => {
   }
 });
 
-test('số trận mỗi trọng tài như đã chốt 30/09', () => {
+test('số trận mỗi trọng tài cân bằng (10-11)', () => {
   const count = {};
   for (const uid of Object.values(plan)) count[byUid[uid]] = (count[byUid[uid]] ?? 0) + 1;
-  assert.deepEqual(count, { 1: 11, 2: 11, 3: 10, 4: 9, 5: 11, 6: 10 });
+  assert.deepEqual(count, { 1: 11, 2: 10, 3: 10, 4: 11, 5: 10, 6: 10 });
+});
+
+// TT1-3 là nữ, TT4-6 là nam: nữ bắt Đôi Nữ, nam ưu tiên Đôi Nam (chỉ 3 trọng tài nam cho 4 bảng Đôi Nam)
+test('trọng tài nữ bắt toàn bộ Đôi Nữ', () => {
+  for (const m of t.matches.filter(x => x.event === 'WD')) assert.ok(byUid[plan[m.id]] <= 3, m.id);
+});
+
+test('trọng tài nam bắt Đôi Nam bảng A, B, C, bán kết và chung kết', () => {
+  const male = id => byUid[plan[id]] >= 4;
+  for (const m of t.matches.filter(x => x.event === 'MD' && ['A', 'B', 'C'].includes(x.group))) assert.ok(male(m.id), m.id);
+  for (const id of ['MD-QF1', 'MD-QF2', 'MD-QF3', 'MD-SF1', 'MD-SF2', 'MD-F']) assert.ok(male(id), id);
 });
 
 test('trọng tài bảng bắt trọn bảng; các trận chung kết đúng người', () => {
   const who = id => byUid[plan[id]];
-  for (const m of t.matches.filter(x => x.event === 'MD' && x.group === 'A')) assert.equal(who(m.id), 1);
-  for (const m of t.matches.filter(x => x.event === 'WD' && x.group === 'A')) assert.equal(who(m.id), 5);
-  assert.deepEqual(['WD-F', 'MD-F', 'XD-F'].map(who), [4, 3, 6]);
+  for (const [ev, g, n] of [['MD', 'A', 4], ['MD', 'B', 5], ['MD', 'C', 6], ['MD', 'D', 3], ['WD', 'A', 1], ['WD', 'B', 2]]) {
+    for (const m of t.matches.filter(x => x.event === ev && x.group === g)) assert.equal(who(m.id), n, m.id);
+  }
+  assert.deepEqual(['WD-F', 'MD-F', 'XD-F'].map(who), [3, 6, 2]);
 });

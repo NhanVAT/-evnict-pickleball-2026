@@ -132,8 +132,10 @@ function editCard(m) {
   if (forfeitOpen === m.id) actions = forfeitPanel(m);
   else if (m.status === 'pending') actions = `<button data-act="start" class="primary" ${ready ? '' : 'disabled'}>Bắt đầu trận</button>${ffBtn}`;
   else if (m.status === 'live') actions = `<button data-act="finish" class="primary" ${s.s1 === s.s2 ? 'disabled title="Tỷ số đang hòa"' : ''}>Kết thúc trận</button>${ffBtn}${clear}`;
-  else if (confirmed) actions = admin ? '<button data-act="unconfirm">Bỏ xác nhận để sửa</button>' : '<p class="lock-note">BTC đã xác nhận kết quả. Cần sửa thì báo Ban tổ chức.</p>';
-  else actions = `${admin ? '<button data-act="confirm" class="primary">Xác nhận kết quả</button>' : ''}<button data-act="reopen">Sửa lại</button>${clear}`;
+  // Trận đã kết thúc: chỉ BTC sửa/xóa/xác nhận; trọng tài chỉ xem (luật Firebase cũng chặn)
+  else if (!admin) actions = `<p class="lock-note">${confirmed ? 'BTC đã xác nhận kết quả.' : 'Đã gửi kết quả, chờ BTC xác nhận.'} Cần sửa thì báo Ban tổ chức.</p>`;
+  else if (confirmed) actions = '<button data-act="unconfirm">Bỏ xác nhận để sửa</button>';
+  else actions = `<button data-act="confirm" class="primary">Xác nhận kết quả</button><button data-act="reopen">Sửa lại</button>${clear}`;
   const pill = statusPill(m);
   return `<article class="a-match ${m.status} stage-${m.stage}" data-id="${m.id}">
     ${meta(m, pill)}

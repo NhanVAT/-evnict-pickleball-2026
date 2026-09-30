@@ -3,7 +3,7 @@
     ".read": true,
     "scores": {
       "$match": {
-        ".write": "auth != null && (auth.uid === 'vRU5cNvtbEVdBlJOzi1EBHFHwSo2' || (root.child('assign').child($match).val() === auth.uid && data.child('confirmed').val() !== true && newData.child('confirmed').val() !== true))",
+        ".write": "auth != null && (auth.uid === 'vRU5cNvtbEVdBlJOzi1EBHFHwSo2' || (root.child('assign').child($match).val() === auth.uid && data.child('status').val() !== 'done' && data.child('confirmed').val() !== true && newData.child('confirmed').val() !== true))",
         ".validate": "newData.hasChildren(['s1', 's2', 'status']) && newData.child('s1').isNumber() && newData.child('s1').val() >= 0 && newData.child('s1').val() <= 99 && newData.child('s2').isNumber() && newData.child('s2').val() >= 0 && newData.child('s2').val() <= 99 && (newData.child('status').val() === 'live' || newData.child('status').val() === 'done') && (!newData.child('confirmed').exists() || newData.child('confirmed').isBoolean())",
         "forfeit": {
           ".validate": "(newData.child('loser').val() === 1 || newData.child('loser').val() === 2) && (newData.child('reason').val() === 'absent' || newData.child('reason').val() === 'retired')"
